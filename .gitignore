@@ -20,4 +20,4 @@ _site/
 config.yaml
 
 # gpx data
-/GPX_OUT/*.gpx
+.GPX_OUT/*.gpx
