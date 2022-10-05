@@ -5,7 +5,7 @@
 
 - ⌚️ 跑步装备是：Apple Watch Series 7 
 - 📱 运动app：Apple Watch自带训练 App
-- 🏃🏻‍♂️ 数据流是：Apple Watch-> Keep-> running page
+- 🏃🏻‍♂️ 数据流是：Apple Watch-> Strava-> running page
 
 
 ![my running data](./assets/github.svg)

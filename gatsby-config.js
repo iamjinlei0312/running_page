@@ -8,7 +8,7 @@ module.exports = {
     navLinks: [
       {
         name: 'Blog',
-        url: 'https://www.jinlei.run/running',
+        url: 'https://mp.weixin.qq.com/s/v3HKppOa3DXRiwcu6VNThg',
       },
       {
         name: 'About',
