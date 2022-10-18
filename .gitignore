@@ -21,3 +21,6 @@ config.yaml
 
 # gpx data
 GPX_OUT/*.gpx
+
+# image display
+image_display
