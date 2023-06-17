@@ -42,7 +42,6 @@ R.I.P. 希望大家都能健康顺利的跑过终点，逝者安息。
 | [L1cardo](https://github.com/L1cardo)           | <https://run.licardo.cn>                     | Nike      |
 | [luckylele666](https://github.com/luckylele666) | <https://0000928.xyz>                        | Strava    |
 | [MFYDev](https://github.com/MFYDev)             | <https://mfydev.run>                         | Garmin-cn |
-| [tianheg](https://github.com/tianheg)           | <https://run.tianheg.xyz/>                   | Keep      |
 | [Oysmart](https://github.com/oysmart)           | <https://run.ouyang.wang>                    | Garmin-cn |
 | [Eished](https://github.com/eished)             | <https://run.iknow.fun>                      | Keep      |
 | [Liuxin](https://github.com/liuxindtc)          | <https://liuxin.run>                         | Nike      |
@@ -56,6 +55,8 @@ R.I.P. 希望大家都能健康顺利的跑过终点，逝者安息。
 | [zhubao315](https://github.com/zhubao315)       | <https://zhubao315.github.io/running>        | Strava    |
 | [Jason Tan](https://github.com/Jason-cqtan)     | <https://jason-cqtan.github.io/running_page> | Nike      |
 | [Conge](https://github.com/conge)               | <https://conge.github.io/running_page>       | Strava      |
+| [cvvz](https://github.com/cvvz)                 | <https://cvvz.github.io/running>             | Strava      |
+| [zHElEARN](https://github.com/zHElEARN)         | <https://workouts.zhelearn.com>              | Strava    |
 
 ## 它是怎么工作的
 
@@ -93,8 +94,10 @@ R.I.P. 希望大家都能健康顺利的跑过终点，逝者安息。
 - **[GPX](#GPX)**
 - **[TCX](#TCX)**
 - **[Tcx+Strava(upload all tcx data to strava)](#TCX_to_Strava)**
+- **[Gpx+Strava(upload all tcx data to strava)](#GPX_to_Strava)**
 - **[Nike+Strava(Using NRC Run, Strava backup data)](#nikestrava)**
-- **[Garmin+Strava(Using Garmin Run, Strava backup data)](#garminstrava)**
+- **[Garmin_to_Strava(Using Garmin Run, Strava backup data)](#Garmin_to_Strava)**
+- **[Strava_to_Garmin(Using Strava Run, Garmin backup data)](#Strava_to_Garmin)**
 
 ## 下载
 
@@ -239,6 +242,22 @@ python3(python) scripts/keep_sync.py 13333xxxx example --with-gpx
 
 </details>
 
+<details>
+<summary>路线偏移修正</summary>
+
+如果您得到的运动路线与实际路线对比有整体偏移，可以修改代码中的参数进行修正
+
+> 注：Keep目前采用的是GCJ-02坐标系，因此导致得到运动数据在使用WGS-84坐标系的平台（Mapbox、佳明等）中显示轨迹整体偏移
+
+- 修改 `scripts/keep_sync.py` 文件中的参数：
+
+```python
+# If your points need trans from gcj02 to wgs84 coordinate which use by Mappbox
+TRANS_GCJ02_TO_WGS84 = True
+```
+
+</details>
+
 ### JoyRun（悦跑圈）
 
 <details>
@@ -322,6 +341,26 @@ python3(python) scripts/codoon_sync.py 13333xxxx xxxx --with-gpx
 
 ```python
 python3(python) scripts/codoon_sync.py 54bxxxxxxx fefxxxxx-xxxx-xxxx --from-auth-token
+```
+
+</details>
+
+<details>
+<summary>路线偏移修正</summary>
+
+如果您得到的运动路线与实际路线对比有整体偏移，可以修改代码中的参数进行修正
+
+> 注：咕咚最初采用GCJ-02坐标系，在2014年3月份左右升级为WGS-84坐标系，导致升级之前的运动数据在使用WGS-84坐标系的平台（Mapbox、佳明等）中显示轨迹整体偏移
+
+- 修改 `scripts/codoon_sync.py` 文件中的参数：
+
+> 注：TRANS_END_DATE 需要根据您的实际情况设定，程序会修正这一天之前的运动记录
+
+```python
+# If your points need trans from gcj02 to wgs84 coordinate which use by Mappbox
+TRANS_GCJ02_TO_WGS84 = True
+# trans the coordinate data until the TRANS_END_DATE, work with TRANS_GCJ02_TO_WGS84 = True
+TRANS_END_DATE = "2014-03-24"
 ```
 
 </details>
@@ -475,12 +514,13 @@ python3(python) scripts/strava_sync.py ${client_id} ${client_secret} ${refresch_
 ### TCX_to_Strava
 
 <details>
-<summary>Upload all tcx files to strava</summary>
+<summary>上传所有的 tcx 格式的跑步数据到 strava</summary>
 
 <br>
 
 1. 完成 strava 的步骤
-2. 在项目根目录下执行:
+2. 把 tcx 文件全部拷贝到 TCX_OUT 中
+3. 在项目根目录下执行:
 
 ```python
 python3(python) scripts/tcx_to_strava_sync.py ${client_id} ${client_secret} ${strava_refresch_token}
@@ -490,7 +530,37 @@ python3(python) scripts/tcx_to_strava_sync.py ${client_id} ${client_secret} ${st
 
 ```python
 python3(python) scripts/tcx_to_strava_sync.py xxx xxx xxx
+或
+python3(python) scripts/tcx_to_strava_sync.py xxx xxx xxx --all
 ```
+
+4. 如果你已经上传过需要跳过判断增加参数 `--all`
+
+</details>
+
+### GPX_to_Strava
+
+<details>
+<summary>上传所有的 gpx 格式的跑步数据到 strava</summary>
+
+<br>
+
+1. 完成 strava 的步骤
+2. 把 gpx 文件全部拷贝到 GPX_OUT 中
+2. 在项目根目录下执行:
+
+```python
+python3(python) scripts/gpx_to_strava_sync.py ${client_id} ${client_secret} ${strava_refresch_token}
+```
+
+示例：
+
+```python
+python3(python) scripts/gpx_to_strava_sync.py xxx xxx xxx
+或
+python3(python) scripts/gpx_to_strava_sync.py xxx xxx xxx --all
+```
+3. 如果你已经上传过需要跳过判断增加参数 `--all`
 
 </details>
 
@@ -498,7 +568,7 @@ python3(python) scripts/tcx_to_strava_sync.py xxx xxx xxx
 ### Nike+Strava
 
 <details>
-<summary>Get your <code>Nike Run Club</code> data and upload to strava</summary>
+<summary>获取 <code>Nike Run Club</code> 的跑步数据然后同步到 Strava</summary>
 
 <br>
 
@@ -515,12 +585,13 @@ python3(python) scripts/nike_to_strava_sync.py ${nike_refresh_token} ${client_id
 python3(python) scripts/nike_to_strava_sync.py eyJhbGciThiMTItNGIw******  xxx xxx xxx
 ```
 
+
 </details>
 
-### Garmin+Strava
+### Garmin_to_Strava
 
 <details>
-<summary>Get your <code>Garmin</code> data and upload to strava</summary>
+<summary>获取你的<code>佳明</code> 的跑步数据，然后同步到 Strava</summary>
 
 <br>
 
@@ -536,6 +607,30 @@ python3(python) scripts/garmin_to_strava_sync.py  ${client_id} ${client_secret} 
 ```python
 python3(python) scripts/garmin_to_strava_sync.py  xxx xxx xxx xx xxx
 ```
+
+</details>
+
+### Strava_to_Garmin
+
+<details>
+<summary>获取你的<code>Strava</code> 的跑步数据然后同步到 Garmin</summary>
+
+<br>
+
+1. 完成 garmin 和 strava 的步骤，同时，还需要在 Github Actions secret 那新增 Strava 配置：`secrets.STRAVA_EMAIL`、`secrets.STRAVA_PASSWORD`
+2. 在项目根目录下执行:
+
+```python
+python3(python) scripts/strava_to_garmin_sync.py ${{ secrets.STRAVA_CLIENT_ID }} ${{ secrets.STRAVA_CLIENT_SECRET }} ${{ secrets.STRAVA_CLIENT_REFRESH_TOKEN }}  ${{ secrets.GARMIN_EMAIL }} ${{ secrets.GARMIN_PASSWORD }} ${{ secrets.STRAVA_EMAIL }} ${{ secrets.STRAVA_PASSWORD }}
+```
+
+如果你的佳明账号是中国区，执行如下的命令：
+
+```python
+python3(python) scripts/strava_to_garmin_sync.py ${{ secrets.STRAVA_CLIENT_ID }} ${{ secrets.STRAVA_CLIENT_SECRET }} ${{ secrets.STRAVA_CLIENT_REFRESH_TOKEN }}  ${{ secrets.GARMIN_CN_EMAIL }} ${{ secrets.GARMIN_CN_PASSWORD }} ${{ secrets.STRAVA_EMAIL }} ${{ secrets.STRAVA_PASSWORD }} --is-cn
+```
+
+注意：**首次初始化的时候，如果你有大量的 strava 跑步数据，可能有些数据会上传失败，只需要多重试几次即可。**
 
 </details>
 
@@ -679,3 +774,14 @@ Actions [源码](https://github.com/yihong0618/running_page/blob/master/.github/
 # 赞赏
 
 谢谢就够了
+
+ # FAQ
+### Strava 100 每 15 分钟的请求， 1000 每日限制
+https://www.strava.com/settings/api
+https://developers.strava.com/docs/#rate-limiting
+
+等待时间限制（这里是strava接口请求限制），不要关闭终端，这里会自动执行下一组上传数据
+```
+Strava API Rate Limit Exceeded. Retry after 100 seconds
+Strava API Rate Limit Timeout. Retry in 799.491622 seconds
+```
