@@ -23,12 +23,11 @@ const MAP_LAYER_LIST = [
   'state-label',
   'country-label',
 ];
-<<<<<<< HEAD:src/utils/const.js
-=======
+
 
 const USE_GOOGLE_ANALYTICS = false;
 const GOOGLE_ANALYTICS_TRACKING_ID = '';
->>>>>>> upstream/master:src/utils/const.ts
+
 
 // styling: set to `true` if you want dash-line route
 const USE_DASH_LINE = true;
@@ -38,13 +37,12 @@ const LINE_OPACITY = 0.4;
 const MAP_HEIGHT = 600;
 //set to `false` if you want to hide the road label characters
 const ROAD_LABEL_DISPLAY = true;
-<<<<<<< HEAD:src/utils/const.js
-=======
+
 //set to `true` if you want to display only the routes without showing the map.
 const PRIVACY_MODE = false;
 //set to `false` if you want to make light off as default, only effect when `PRIVACY_MODE` = false
 const LIGHTS_ON = true;
->>>>>>> upstream/master:src/utils/const.ts
+
 
 // IF you outside China please make sure IS_CHINESE = false
 const IS_CHINESE = true;
@@ -53,11 +51,9 @@ const CHINESE_INFO_MESSAGE = (yearLength: number, year: string): string => {
   const yearStr = year === 'Total' ? '所有' : ` ${year} `;
   return `我用 App 记录自己跑步 ${yearLength} 年了，下面列表展示的是${yearStr}的数据`;
 };
-<<<<<<< HEAD:src/utils/const.js
-const ENGLISH_INFO_MESSAGE = (yearLength, year) =>
-=======
+
 const ENGLISH_INFO_MESSAGE = (yearLength: number, year: string): string =>
->>>>>>> upstream/master:src/utils/const.ts
+
   `Running Journey with ${yearLength} Years, the table shows year ${year} data`;
 
 // not support English for now
