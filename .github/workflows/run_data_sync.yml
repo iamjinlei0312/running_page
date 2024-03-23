@@ -8,18 +8,7 @@ on:
     branches:
       - master
     paths:
-<<<<<<< HEAD
-      - scripts/nike_sync.py
-      - scripts/nike_to_strava_sync.py
-      - scripts/strava_sync.py
-      - scripts/gen_svg.py
-      - scripts/garmin_sync.py
-      - scripts/keep_sync.py
-      - scripts/gpx_sync.py
-      - scripts/tcx_sync.py
-      - scripts/garmin_to_strava_sync.py
-      - scripts/codoon_sync.py
-=======
+      - run_page/codoon_sync.py
       - run_page/nike_sync.py
       - run_page/nike_to_strava_sync.py
       - run_page/strava_sync.py
@@ -30,12 +19,10 @@ on:
       - run_page/gpx_sync.py
       - run_page/tcx_sync.py
       - run_page/garmin_to_strava_sync.py
->>>>>>> upstream/master
       - requirements.txt
 
 env:
   # please change to your own config.
-<<<<<<< HEAD
   RUN_TYPE: codoon_sync # support strava/nike/garmin/garmin_cn/keep/only_gpx/nike_to_strava/strava_to_garmin/strava_to_garmin_cn/garmin_to_strava/garmin_to_strava_cn, Please change the 'pass' it to your own
   ATHLETE: Jinlei0312
   TITLE: Jinlei0312 Running
@@ -43,14 +30,7 @@ env:
   TITLE_GRID: Over 10km Runs # also here
   GITHUB_NAME: iamjinlei0312
   GITHUB_EMAIL: jinlei0312@gmail.com
-=======
-  RUN_TYPE: pass # support strava/nike/garmin/coros/garmin_cn/garmin_sync_cn_global/keep/only_gpx/only_fit/nike_to_strava/strava_to_garmin/strava_to_garmin_cn/garmin_to_strava/garmin_to_strava_cn/codoon, Please change the 'pass' it to your own
-  ATHLETE: yihong0618
-  TITLE: Yihong0618 Running
-  MIN_GRID_DISTANCE: 10 # change min distance here
-  TITLE_GRID: Over 10km Runs # also here
-  GITHUB_NAME: yihong0618 # change to yours
-  GITHUB_EMAIL: zouzou0208@gmail.com # change to yours
+
 
   # IGNORE_BEFORE_SAVING: True # if you want to ignore some data before saving, set this to True
   IGNORE_START_END_RANGE: 10 # Unit meter
@@ -59,8 +39,8 @@ env:
   IGNORE_RANGE: 10 # Unit meter
   SAVE_DATA_IN_GITHUB_CACHE: false # if you deploy in the vercal, check the README
   DATA_CACHE_PREFIX: 'track_data'
-  BUILD_GH_PAGES: true # If you do not need GitHub Page please set it to `false`
->>>>>>> upstream/master
+  BUILD_GH_PAGES: false # If you do not need GitHub Page please set it to `false`
+
 
 jobs:
   sync:
@@ -109,10 +89,7 @@ jobs:
       - name: Run sync Codoon script
         if: env.RUN_TYPE == 'codoon_sync'
         run: |
-<<<<<<< HEAD
-          python scripts/codoon_sync.py ${{ secrets.CODOON_MOBILE }} ${{ secrets.CODOON_PASSWORD }} --with-gpx
-=======
-          python run_page/nike_sync.py ${{ secrets.NIKE_REFRESH_TOKEN }}
+          python run_page/codoon_sync.py ${{ secrets.CODOON_MOBILE }} ${{ secrets.CODOON_PASSWORD }} --with-gpx
 
       - name: Run sync Nike to Strava(Run with nike data backup and show with strava)
         if: env.RUN_TYPE == 'nike_to_strava'
@@ -165,7 +142,6 @@ jobs:
         # If you only want to sync `type running` add args --only-run, default script is to sync all data (rides and runs).
         # python run_page/garmin_sync_cn_global.py ${{ secrets.GARMIN_SECRET_STRING_CN }} ${{ secrets.GARMIN_SECRET_STRING }}  --only-run
 
->>>>>>> upstream/master
 
       - name: Run sync Only GPX script
         if: env.RUN_TYPE == 'only_gpx'
@@ -182,39 +158,6 @@ jobs:
         run: |
           python run_page/tcx_sync.py
 
-<<<<<<< HEAD
-      - name: Make svg GitHub profile
-        if: env.RUN_TYPE != 'pass'
-        run: |
-          python scripts/gen_svg.py --from-db --title "${{ env.TITLE }}" --type github --athlete "${{ env.ATHLETE }}" --special-distance 5 --special-distance2 10 --special-color yellow --special-color2 red --output assets/github.svg --use-localtime --min-distance 0.5
-          python scripts/gen_svg.py --from-db --title "${{ env.TITLE_GRID }}" --type grid --athlete "${{ env.ATHLETE }}" --output assets/grid.svg --special-color yellow --special-color2 red --special-distance 10 --special-distance2 20 --use-localtime --min-distance "${{ env.MIN_GRID_DISTANCE }}"
-          python scripts/gen_svg.py --from-db --type circular --use-localtime
-          python scripts/gen_svg.py --from-db --year $(date +"%Y")  --language zh_CN --title "$(date +"%Y") Running" --type github --athlete "${{ env.ATHLETE }}" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github_$(date +"%Y").svg --use-localtime --min-distance 0.5
-=======
-      - name: Run sync Strava to Garmin(Run with strava(or others upload to strava) data backup in Garmin)
-        if: env.RUN_TYPE == 'strava_to_garmin'
-        run: |
-          python run_page/strava_to_garmin_sync.py ${{ secrets.STRAVA_CLIENT_ID }} ${{ secrets.STRAVA_CLIENT_SECRET }} ${{ secrets.STRAVA_CLIENT_REFRESH_TOKEN }}  ${{ secrets.GARMIN_SECRET_STRING }} ${{ secrets.STRAVA_EMAIL }} ${{ secrets.STRAVA_PASSWORD }}
-
-      - name: Run sync Strava to Garmin-cn(Run with strava(or others upload to strava) data backup in Garmin-cn)
-        if: env.RUN_TYPE == 'strava_to_garmin_cn'
-        run: |
-          python run_page/strava_to_garmin_sync.py ${{ secrets.STRAVA_CLIENT_ID }} ${{ secrets.STRAVA_CLIENT_SECRET }} ${{ secrets.STRAVA_CLIENT_REFRESH_TOKEN }}  ${{ secrets.GARMIN_SECRET_STRING_CN }} ${{ secrets.STRAVA_EMAIL }} ${{ secrets.STRAVA_PASSWORD }} --is-cn
-
-      - name: Run sync Garmin-cn to Strava(Run with Garmin data backup in Strava)
-        if: env.RUN_TYPE == 'garmin_to_strava_cn'
-        run: |
-          python run_page/garmin_to_strava_sync.py ${{ secrets.STRAVA_CLIENT_ID }} ${{ secrets.STRAVA_CLIENT_SECRET }} ${{ secrets.STRAVA_CLIENT_REFRESH_TOKEN }}  ${{ secrets.GARMIN_SECRET_STRING_CN }}  --is-cn
-
-      - name: Run sync Garmin to Strava(Run with Garmin data backup in Strava)
-        if: env.RUN_TYPE == 'garmin_to_strava'
-        run: |
-          python run_page/garmin_to_strava_sync.py ${{ secrets.STRAVA_CLIENT_ID }} ${{ secrets.STRAVA_CLIENT_SECRET }} ${{ secrets.STRAVA_CLIENT_REFRESH_TOKEN }}  ${{ secrets.GARMIN_EMAIL }} ${{ secrets.GARMIN_PASSWORD }}
-
-      - name: Run sync Tulipsport script
-        if: env.RUN_TYPE == 'tulipsport'
-        run: |
-          python run_page/tulipsport_sync.py ${{ secrets.TULIPSPORT_TOKEN }} --with-gpx
 
       - name: Make svg GitHub profile
         if: env.RUN_TYPE != 'pass'
@@ -223,7 +166,6 @@ jobs:
           python run_page/gen_svg.py --from-db --title "${{ env.TITLE_GRID }}" --type grid --athlete "${{ env.ATHLETE }}" --output assets/grid.svg --special-color yellow --special-color2 red --special-distance 20 --special-distance2 40 --use-localtime --min-distance "${{ env.MIN_GRID_DISTANCE }}"
           python run_page/gen_svg.py --from-db --type circular --use-localtime
           python run_page/gen_svg.py --from-db --year $(date +"%Y")  --language zh_CN --title "$(date +"%Y") Running" --type github --athlete "${{ env.ATHLETE }}" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github_$(date +"%Y").svg --use-localtime --min-distance 0.5
->>>>>>> upstream/master
 
       - name: Push new runs
         if: env.SAVE_DATA_IN_GITHUB_CACHE != 'true'
