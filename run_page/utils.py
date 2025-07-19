@@ -121,3 +121,31 @@ def upload_file_to_strava(client, file_name, data_type, force_to_run=True):
         print(
             f"Uploading {data_type} file: {file_name} to strava, upload_id: {r.upload_id}."
         )
+
+
+def safe_json_response(response):
+    """
+    Safely parse JSON response from requests, handling empty responses and invalid JSON.
+    
+    Args:
+        response: requests.Response object
+        
+    Returns:
+        dict: Parsed JSON data
+        
+    Raises:
+        Exception: If response is empty or contains invalid JSON
+    """
+    try:
+        # Check if response has content
+        if not response.content:
+            raise Exception(f"Empty response from {response.url}")
+        
+        # Try to parse JSON
+        return response.json()
+    except json.JSONDecodeError as e:
+        # Log the response content for debugging
+        content_preview = response.text[:200] if response.text else "No content"
+        raise Exception(f"Invalid JSON response from {response.url}: {content_preview}... Error: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error parsing response from {response.url}: {str(e)}")

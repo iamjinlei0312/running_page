@@ -14,7 +14,7 @@ import requests
 from config import GPX_FOLDER, JSON_FILE, SQL_FILE, run_map, start_point
 from Crypto.Cipher import AES
 from generator import Generator
-from utils import adjust_time
+from utils import adjust_time, safe_json_response
 import xml.etree.ElementTree as ET
 
 KEEP_SPORT_TYPES = ["running", "hiking", "cycling"]
@@ -46,9 +46,22 @@ def login(session, mobile, password):
     data = {"mobile": mobile, "password": password}
     r = session.post(LOGIN_API, headers=headers, data=data)
     if r.ok:
-        token = r.json()["data"]["token"]
-        headers["Authorization"] = f"Bearer {token}"
-        return session, headers
+        try:
+            login_data = safe_json_response(r)
+            token = login_data["data"]["token"]
+            headers["Authorization"] = f"Bearer {token}"
+            return session, headers
+        except Exception as e:
+            print(f"Login failed: {e}")
+            raise Exception("Failed to parse login response")
+    else:
+        print(f"Login request failed with status code: {r.status_code}")
+        try:
+            error_data = safe_json_response(r)
+            print(f"Error response: {error_data}")
+        except Exception as e:
+            print(f"Failed to parse error response: {e}")
+        raise Exception("Login failed - check your mobile and password")
 
 
 def get_to_download_runs_ids(session, headers, sport_type):
@@ -61,17 +74,25 @@ def get_to_download_runs_ids(session, headers, sport_type):
             headers=headers,
         )
         if r.ok:
-            run_logs = r.json()["data"]["records"]
+            try:
+                response_data = safe_json_response(r)
+                run_logs = response_data["data"]["records"]
 
-            for i in run_logs:
-                logs = [j["stats"] for j in i["logs"]]
-                result.extend(k["id"] for k in logs if not k["isDoubtful"])
-            last_date = r.json()["data"]["lastTimestamp"]
-            since_time = datetime.fromtimestamp(last_date / 1000, tz=timezone.utc)
-            print(f"pares keep ids data since {since_time}")
-            time.sleep(1)  # spider rule
-            if not last_date:
+                for i in run_logs:
+                    logs = [j["stats"] for j in i["logs"]]
+                    result.extend(k["id"] for k in logs if not k["isDoubtful"])
+                last_date = response_data["data"]["lastTimestamp"]
+                since_time = datetime.fromtimestamp(last_date / 1000, tz=timezone.utc)
+                print(f"pares keep ids data since {since_time}")
+                time.sleep(1)  # spider rule
+                if not last_date:
+                    break
+            except Exception as e:
+                print(f"Error parsing response: {e}")
                 break
+        else:
+            print(f"Request failed with status code: {r.status_code}")
+            break
     return result
 
 
@@ -80,7 +101,14 @@ def get_single_run_data(session, headers, run_id, sport_type):
         RUN_LOG_API.format(sport_type=sport_type, run_id=run_id), headers=headers
     )
     if r.ok:
-        return r.json()
+        try:
+            return safe_json_response(r)
+        except Exception as e:
+            print(f"Failed to parse single run data: {e}")
+            raise
+    else:
+        print(f"Request failed with status code: {r.status_code}")
+        raise Exception("Failed to get single run data")
 
 
 def decode_runmap_data(text, is_geo=False):

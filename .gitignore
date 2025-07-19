@@ -26,3 +26,10 @@ route.png
 route.svg
 
 .env
+
+GPX_OUT/*
+!GPX_OUT/.gitkeep
+
+# Database and imported data files
+run_page/data.db
+imported.json

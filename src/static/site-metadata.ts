@@ -16,7 +16,7 @@ const getBasePath = () => {
 
 const data: ISiteMetadataResult = {
   siteTitle: 'Running Page',
-  siteUrl: 'https://yihong.run',
+  siteUrl: 'https://jinlei.run',
   logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTtc69JxHNcmN1ETpMUX4dozAgAN6iPjWalQ&usqp=CAU',
   description: 'Personal site and blog',
   navLinks: [
@@ -25,12 +25,12 @@ const data: ISiteMetadataResult = {
       url: `${getBasePath()}/summary`,
     },
     {
-      name: 'Blog',
-      url: 'https://github.com/yihong0618/gitblog',
+      name: '抖音',
+      url: 'https://www.douyin.com/user/self?from_tab_name=main&showTab=post',
     },
     {
       name: 'About',
-      url: 'https://github.com/yihong0618/running_page/blob/master/README-CN.md',
+      url: 'https://github.com/iamjinlei0312',
     },
   ],
 };
