@@ -25,8 +25,8 @@ const data: ISiteMetadataResult = {
       url: `${getBasePath()}/summary`,
     },
     {
-      name: '抖音',
-      url: 'https://www.douyin.com/user/self?from_tab_name=main&showTab=post',
+      name: '来抖音找我',
+      url: 'https://www.douyin.com/user/MS4wLjABAAAAdPieDJD0m7e9ohDlk-5DZJWIn2In2uxnbrzkkkmf_dI',
     },
     {
       name: 'About',
