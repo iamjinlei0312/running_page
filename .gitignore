@@ -33,4 +33,3 @@ GPX_OUT/*
 # Database and imported data files
 run_page/data.db
 imported.json
-src/static/activities.json
