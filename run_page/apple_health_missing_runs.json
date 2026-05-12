@@ -1,0 +1,85 @@
+{
+  "source": "/Users/zhangjinlei/Downloads/apple_health_export/导出.xml",
+  "notes": [
+    "These Apple Health running workouts were not returned by Keep sync on 2026-05-12.",
+    "They are keyed by start_date_local date so future backfills do not need to diff the full Apple Health export again.",
+    "The 2023-09-21 indoor run is intentionally not listed here because Keep already imported it as VirtualRun."
+  ],
+  "runs": [
+    {
+      "date": "2022-07-10",
+      "start_date_local": "2022-07-10 06:39:25",
+      "route_path": "/workout-routes/route_2022-07-10_6.58am.gpx"
+    },
+    {
+      "date": "2022-07-11",
+      "start_date_local": "2022-07-11 05:44:40",
+      "route_path": "/workout-routes/route_2022-07-11_6.02am.gpx"
+    },
+    {
+      "date": "2022-07-13",
+      "start_date_local": "2022-07-13 05:32:22",
+      "route_path": "/workout-routes/route_2022-07-13_10.50am.gpx"
+    },
+    {
+      "date": "2022-07-15",
+      "start_date_local": "2022-07-15 06:15:42",
+      "route_path": "/workout-routes/route_2022-07-15_8.38am.gpx"
+    },
+    {
+      "date": "2022-07-18",
+      "start_date_local": "2022-07-18 06:14:10",
+      "route_path": "/workout-routes/route_2022-07-18_6.27am.gpx"
+    },
+    {
+      "date": "2022-07-21",
+      "start_date_local": "2022-07-21 05:36:21",
+      "route_path": "/workout-routes/route_2022-07-21_6.00am.gpx"
+    },
+    {
+      "date": "2022-07-24",
+      "start_date_local": "2022-07-24 06:00:52",
+      "route_path": "/workout-routes/route_2022-07-24_6.46am.gpx"
+    },
+    {
+      "date": "2023-02-24",
+      "start_date_local": "2023-02-24 11:21:19",
+      "route_path": "/workout-routes/route_2023-02-24_11.33am.gpx"
+    },
+    {
+      "date": "2023-02-25",
+      "start_date_local": "2023-02-25 12:02:08",
+      "route_path": "/workout-routes/route_2023-02-25_12.14pm.gpx"
+    },
+    {
+      "date": "2023-02-26",
+      "start_date_local": "2023-02-26 20:12:23",
+      "route_path": "/workout-routes/route_2023-02-26_8.44pm.gpx"
+    },
+    {
+      "date": "2023-10-11",
+      "start_date_local": "2023-10-11 06:36:11",
+      "route_path": "/workout-routes/route_2023-10-11_6.46am.gpx"
+    },
+    {
+      "date": "2023-10-14",
+      "start_date_local": "2023-10-14 07:24:33",
+      "route_path": "/workout-routes/route_2023-10-14_7.53am.gpx"
+    },
+    {
+      "date": "2023-10-15",
+      "start_date_local": "2023-10-15 05:48:12",
+      "route_path": "/workout-routes/route_2023-10-15_7.57am.gpx"
+    },
+    {
+      "date": "2023-10-19",
+      "start_date_local": "2023-10-19 06:42:11",
+      "route_path": "/workout-routes/route_2023-10-19_7.13am.gpx"
+    },
+    {
+      "date": "2023-10-22",
+      "start_date_local": "2023-10-22 07:32:33",
+      "route_path": "/workout-routes/route_2023-10-22_9.40am.gpx"
+    }
+  ]
+}

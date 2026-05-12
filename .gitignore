@@ -3,6 +3,7 @@
 .cache
 *.pyc
 node_modules
+.pnpm-store/
 yarn-error.log
 
 # Build directory
@@ -33,3 +34,6 @@ GPX_OUT/*
 # Database and imported data files
 run_page/data.db
 imported.json
+
+# Tests
+tests/

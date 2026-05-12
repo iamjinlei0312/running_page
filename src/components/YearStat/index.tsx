@@ -1,4 +1,5 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
+import YearSummaryModal from '@/components/YearSummaryModal';
 import Stat from '@/components/Stat';
 import useActivities from '@/hooks/useActivities';
 import { formatPace } from '@/utils/utils';
@@ -17,6 +18,7 @@ const YearStat = ({
   let { activities: runs, years } = useActivities();
   // for hover
   const [hovered, eventHandlers] = useHover();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // lazy Component
   const YearSVG = lazy(() => loadSvgComponent(yearStats, `./year_${year}.svg`));
 
@@ -64,7 +66,18 @@ const YearStat = ({
       onClick={() => onClick(year)}
       {...eventHandlers}
     >
-      <section>
+      <section className="relative">
+        {year !== 'Total' && (
+          <button 
+            className="absolute right-0 top-2 z-10 rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsModalOpen(true);
+            }}
+          >
+            Summary Modal
+          </button>
+        )}
         <Stat value={year} description=" Journey" />
         <Stat value={runs.length} description=" Runs" />
         <Stat value={sumDistance} description=" KM" />
@@ -83,6 +96,7 @@ const YearStat = ({
         </Suspense>
       )}
       <hr />
+      {isModalOpen && <YearSummaryModal year={year} onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 };
