@@ -97,6 +97,11 @@ jobs:
           ATHLETE: ${{ env.ATHLETE }}
           MIN_GRID_DISTANCE: ${{ env.MIN_GRID_DISTANCE }}
         run: |
+          # Restore db from activities.json if it doesn't exist
+          if [ ! -f "run_page/data.db" ]; then
+            python run_page/restore_db.py || echo "Restore failed, ignoring"
+          fi
+          
           # Nike sync
           if [ "${{ env.RUN_TYPE }}" = "nike" ]; then
             python run_page/nike_sync.py ${{ secrets.NIKE_REFRESH_TOKEN }}
