@@ -37,3 +37,5 @@ imported.json
 
 # Tests
 tests/
+
+OUT_FOLDER/

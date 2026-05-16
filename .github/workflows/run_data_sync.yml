@@ -250,6 +250,26 @@ jobs:
           git commit -m 'update new runs' || echo "nothing to commit"
           git push || echo "nothing to push"
 
+      - name: Sync Circular SVG to Profile
+        if: env.RUN_TYPE != 'pass'
+        env:
+          PROFILE_REPO_PAT: ${{ secrets.PROFILE_REPO_PAT }}
+        run: |
+          pip install github-poster
+          python run_page/gen_github_poster_circular.py
+          if [ -f "OUT_FOLDER/json_circular.svg" ] && [ -n "$PROFILE_REPO_PAT" ]; then
+            git clone https://x-access-token:${PROFILE_REPO_PAT}@github.com/iamjinlei0312/iamjinlei0312.git profile_repo
+            cp OUT_FOLDER/json_circular.svg profile_repo/apple_health_circular.svg
+            cd profile_repo
+            git config user.name "GitHub Action"
+            git config user.email "action@github.com"
+            git add apple_health_circular.svg
+            git commit -m "Update animated circular SVG" || echo "nothing to commit"
+            git push
+          else
+            echo "SVG not generated or PROFILE_REPO_PAT is missing."
+          fi
+
       - name: Set Output
         id: set_output
         env:
