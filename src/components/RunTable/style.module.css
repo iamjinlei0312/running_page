@@ -28,6 +28,13 @@
 
     :is(th) {
       padding: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+
+    :is(th):hover {
+      color: var(--color-primary);
     }
   }
   :is(th, td):nth-child(1) {

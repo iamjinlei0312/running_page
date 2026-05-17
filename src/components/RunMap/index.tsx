@@ -57,9 +57,10 @@ const RunMap = ({
   thisYear,
 }: IRunMapProps) => {
   const { countries, provinces } = useActivities();
-  const mapRef = useRef<MapRef>();
+  const mapRef = useRef<MapRef | null>(null);
   const [lights, setLights] = useState(PRIVACY_MODE ? false : LIGHTS_ON);
   const keepWhenLightsOff = ['runs2'];
+  const [mapGeoData, setMapGeoData] = useState<FeatureCollection<RPGeometry> | null>(null);
   const mapStyle = getMapStyle(
     MAP_TILE_VENDOR,
     MAP_TILE_STYLE,
@@ -91,14 +92,15 @@ const RunMap = ({
             return;
           }
           if (!ROAD_LABEL_DISPLAY) {
-            const layers = map.getStyle().layers;
+            const layers = (map.getStyle().layers ?? []) as any[];
             const labelLayerNames = layers
               .filter(
-                (layer: any) =>
+                (layer) =>
                   (layer.type === 'symbol' || layer.type === 'composite') &&
-                  layer.layout.text_field !== null
+                  (layer.layout?.['text-field'] !== undefined ||
+                    layer.layout?.text_field !== undefined)
               )
-              .map((layer: any) => layer.id);
+              .map((layer) => layer.id);
             labelLayerNames.forEach((layerId) => {
               map.removeLayer(layerId);
             });
@@ -123,11 +125,14 @@ const RunMap = ({
   const initGeoDataLength = geoData.features.length;
   const isBigMap = (viewState.zoom ?? 0) <= 3;
   if (isBigMap && IS_CHINESE) {
+    if (!mapGeoData) {
+      setMapGeoData(geoJsonForMap());
+    }
     // Show boundary and line together, combine geoData(only when not combine yet)
-    if (geoData.features.length === initGeoDataLength) {
+    if (mapGeoData && geoData.features.length === initGeoDataLength) {
       geoData = {
         type: 'FeatureCollection',
-        features: geoData.features.concat(geoJsonForMap().features),
+        features: geoData.features.concat(mapGeoData.features),
       };
     }
   }

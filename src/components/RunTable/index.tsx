@@ -19,61 +19,92 @@ interface IRunTableProperties {
   setRunIndex: (_index: number) => void;
 }
 
-type SortFunc = (_a: Activity, _b: Activity) => number;
+type SortDirection = 'ascending' | 'descending';
+
+interface SortState {
+  direction: SortDirection;
+  key: string;
+}
 
 const RunTable = ({
   runs,
   locateActivity,
-  setActivity,
+  setActivity, // this prop might no longer be strictly needed for sorting if we sort locally, but keeping it to avoid breaking changes
   runIndex,
   setRunIndex,
 }: IRunTableProperties) => {
-  const [sortFuncInfo, setSortFuncInfo] = useState('');
-  // TODO refactor?
-  const sortKMFunc: SortFunc = (a, b) =>
-    sortFuncInfo === 'KM' ? a.distance - b.distance : b.distance - a.distance;
-  const sortElevationGainFunc: SortFunc = (a, b) =>
-    sortFuncInfo === 'Elevation Gain'
-      ? (a.elevation_gain ?? 0) - (b.elevation_gain ?? 0)
-      : (b.elevation_gain ?? 0) - (a.elevation_gain ?? 0);
-  const sortPaceFunc: SortFunc = (a, b) =>
-    sortFuncInfo === 'Pace'
-      ? a.average_speed - b.average_speed
-      : b.average_speed - a.average_speed;
-  const sortBPMFunc: SortFunc = (a, b) => {
-    return sortFuncInfo === 'BPM'
-      ? (a.average_heartrate ?? 0) - (b.average_heartrate ?? 0)
-      : (b.average_heartrate ?? 0) - (a.average_heartrate ?? 0);
-  };
-  const sortRunTimeFunc: SortFunc = (a, b) => {
-    const aTotalSeconds = convertMovingTime2Sec(a.moving_time);
-    const bTotalSeconds = convertMovingTime2Sec(b.moving_time);
-    return sortFuncInfo === 'Time'
-      ? aTotalSeconds - bTotalSeconds
-      : bTotalSeconds - aTotalSeconds;
-  };
-  const sortDateFuncClick =
-    sortFuncInfo === 'Date' ? sortDateFunc : sortDateFuncReverse;
-  const sortFuncMap = new Map([
-    ['KM', sortKMFunc],
-    ['Elevation Gain', sortElevationGainFunc],
-    ['Pace', sortPaceFunc],
-    ['BPM', sortBPMFunc],
-    ['Time', sortRunTimeFunc],
-    ['Date', sortDateFuncClick],
-  ]);
-  if (!SHOW_ELEVATION_GAIN) {
-    sortFuncMap.delete('Elevation Gain');
-  }
+  const [sortState, setSortState] = useState<SortState | null>(null);
 
-  const handleClick: React.MouseEventHandler<HTMLElement> = (e) => {
-    const funcName = (e.target as HTMLElement).innerHTML;
-    const f = sortFuncMap.get(funcName);
+  const sortKeys = React.useMemo(() => {
+    const keys = ['KM', 'Elevation Gain', 'Pace', 'BPM', 'Time', 'Date'];
+    return SHOW_ELEVATION_GAIN ? keys : keys.filter((key) => key !== 'Elevation Gain');
+  }, []);
 
-    setRunIndex(-1);
-    setSortFuncInfo(sortFuncInfo === funcName ? '' : funcName);
-    setActivity(runs.sort(f));
-  };
+  const getSortFunction = React.useCallback(
+    (key: string, direction: SortDirection): SortFunc | undefined => {
+      const multiplier = direction === 'ascending' ? 1 : -1;
+
+      if (key === 'KM') {
+        return (a, b) => (a.distance - b.distance) * multiplier;
+      }
+      if (key === 'Elevation Gain') {
+        return (a, b) =>
+          ((a.elevation_gain ?? 0) - (b.elevation_gain ?? 0)) * multiplier;
+      }
+      if (key === 'Pace') {
+        return (a, b) => (a.average_speed - b.average_speed) * multiplier;
+      }
+      if (key === 'BPM') {
+        return (a, b) =>
+          ((a.average_heartrate ?? 0) - (b.average_heartrate ?? 0)) *
+          multiplier;
+      }
+      if (key === 'Time') {
+        return (a, b) =>
+          (convertMovingTime2Sec(a.moving_time) -
+            convertMovingTime2Sec(b.moving_time)) *
+          multiplier;
+      }
+      if (key === 'Date') {
+        return direction === 'ascending' ? sortDateFuncReverse : sortDateFunc;
+      }
+
+      return undefined;
+    },
+    []
+  );
+
+  const displayedRuns = React.useMemo(() => {
+    if (!sortState) return runs;
+
+    const sortFunction = getSortFunction(sortState.key, sortState.direction);
+    if (!sortFunction) return runs;
+
+    return runs.slice().sort(sortFunction);
+  }, [getSortFunction, runs, sortState]);
+
+  const runIndexById = React.useMemo(
+    () => new Map(runs.map((run, index) => [run.run_id, index])),
+    [runs]
+  );
+
+  const handleClick = React.useCallback(
+    (key: string) => {
+      setRunIndex(-1);
+      setSortState((currentState) => {
+        const initialDirection = key === 'Date' ? 'ascending' : 'descending';
+        const nextDirection =
+          currentState?.key === key && currentState.direction === 'descending'
+            ? 'ascending'
+            : initialDirection;
+
+        return { key, direction: nextDirection };
+      });
+      // to support legacy setActivity prop behavior if relied upon
+      setActivity(runs);
+    },
+    [setRunIndex, setActivity, runs]
+  );
 
   return (
     <div className={styles.tableContainer}>
@@ -81,24 +112,27 @@ const RunTable = ({
         <thead>
           <tr>
             <th />
-            {Array.from(sortFuncMap.keys()).map((k) => (
-              <th key={k} onClick={handleClick}>
+            {sortKeys.map((k) => (
+              <th key={k} onClick={() => handleClick(k)}>
                 {k}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {runs.map((run, elementIndex) => (
-            <RunRow
-              key={run.run_id}
-              elementIndex={elementIndex}
-              locateActivity={locateActivity}
-              run={run}
-              runIndex={runIndex}
-              setRunIndex={setRunIndex}
-            />
-          ))}
+          {displayedRuns.map((run) => {
+            const sourceIndex = runIndexById.get(run.run_id) ?? -1;
+            return (
+              <RunRow
+                key={run.run_id}
+                elementIndex={sourceIndex}
+                locateActivity={locateActivity}
+                run={run}
+                runIndex={runIndex}
+                setRunIndex={setRunIndex}
+              />
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -106,3 +140,4 @@ const RunTable = ({
 };
 
 export default RunTable;
+
