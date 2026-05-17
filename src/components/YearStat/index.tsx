@@ -69,7 +69,7 @@ const YearStat = ({
       <section className="relative">
         {year !== 'Total' && (
           <button 
-            className="absolute right-0 top-2 z-10 rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white"
+            className="absolute right-0 top-2 z-10 mr-2 rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white lg:mr-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsModalOpen(true);

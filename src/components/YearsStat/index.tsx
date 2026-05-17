@@ -16,9 +16,8 @@ const YearsStat = ({
   yearsArrayUpdate = yearsArrayUpdate.filter((x) => x !== year);
   yearsArrayUpdate.unshift(year);
 
-  // for short solution need to refactor
   return (
-    <div className="w-full pb-16 pr-16 lg:w-full lg:pr-16">
+    <div className="w-full pb-16 lg:w-full lg:pr-16">
       <section className="pb-0">
         <p className="leading-relaxed">
           {INFO_MESSAGE(years.length, year)}

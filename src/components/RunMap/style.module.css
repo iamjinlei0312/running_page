@@ -31,13 +31,26 @@
 }
 
 .runTitle {
-  height: 29px;
-  width: 710px;
   position: absolute;
-  bottom: 0px;
-  left: 120px;
+  bottom: 35px;
+  left: 10px;
+  right: 10px;
   cursor: pointer;
   color: var(--color-primary);
+  /* for single line cutoff */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+  .runTitle {
+    height: 29px;
+    width: 710px;
+    bottom: 0px;
+    left: 120px;
+    right: auto;
+  }
 }
 
 .lights {
