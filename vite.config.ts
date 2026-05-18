@@ -47,6 +47,7 @@ export default defineConfig({
     'import.meta.env.VERCEL': JSON.stringify(process.env.VERCEL),
   },
   build: {
+    chunkSizeWarningLimit: 1000,
     manifest: true,
     outDir: './dist', // for user easy to use, vercel use default dir -> dist
     rollupOptions: {
