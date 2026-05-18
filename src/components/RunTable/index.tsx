@@ -26,6 +26,8 @@ interface SortState {
   key: string;
 }
 
+type SortFunc = (a: Activity, b: Activity) => number;
+
 const RunTable = ({
   runs,
   locateActivity,

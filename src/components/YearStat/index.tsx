@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import YearSummaryModal from '@/components/YearSummaryModal';
 import Stat from '@/components/Stat';
 import useActivities from '@/hooks/useActivities';
