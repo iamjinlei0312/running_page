@@ -28,22 +28,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv pip install . --system
+          uv sync --frozen
 
       - name: Run GPX sync test
         run: |
-          # make sure the gpx_sync.py script is executable
-          python run_page/gpx_sync.py
+          uv run python run_page/gpx_sync.py
 
       - name: Check formatting (black)
         run: |
-          uv pip install black
-          black . --diff --color && black . --check
+          uv run --with black black . --diff --color && uv run --with black black . --check
 
       - name: Lint with Ruff
         run: |
-          uv pip install ruff
-          ruff check .
+          uv run --with ruff ruff check .
 
   node_lint_and_test:
     runs-on: ubuntu-latest
