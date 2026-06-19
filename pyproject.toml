@@ -15,6 +15,7 @@ dependencies = [
   "geopy",
   "polyline",
   "sqlalchemy",
+  "textual",
   "tzfpy; platform_system != \"Windows\"",
   "timezonefinder; platform_system == \"Windows\"",
   "pyyaml",
@@ -37,10 +38,14 @@ dependencies = [
   "openai",
   "svglib>=1.5.1",
   "cairosvg>=2.7.1",
+  "certifi==2025.1.31",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }
+
+[project.scripts]
+run_page = "run_page.tui.app:main"
 
 [build-system]
 requires = ["pdm-backend"]
@@ -49,3 +54,9 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+packages = ["run_page"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

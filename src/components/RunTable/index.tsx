@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   sortDateFunc,
   sortDateFuncReverse,
@@ -7,6 +7,7 @@ import {
   RunIds,
 } from '@/utils/utils';
 import { SHOW_ELEVATION_GAIN } from '@/utils/const';
+import { DIST_UNIT } from '@/utils/utils';
 
 import RunRow from './RunRow';
 import styles from './style.module.css';
@@ -14,11 +15,11 @@ import styles from './style.module.css';
 interface IRunTableProperties {
   runs: Activity[];
   locateActivity: (_runIds: RunIds) => void;
-  setActivity: (_runs: Activity[]) => void;
   runIndex: number;
   setRunIndex: (_index: number) => void;
 }
 
+type SortFunc = (_a: Activity, _b: Activity) => number;
 type SortDirection = 'ascending' | 'descending';
 
 interface SortState {
@@ -26,30 +27,27 @@ interface SortState {
   key: string;
 }
 
-type SortFunc = (a: Activity, b: Activity) => number;
-
 const RunTable = ({
   runs,
   locateActivity,
-  setActivity, // this prop might no longer be strictly needed for sorting if we sort locally, but keeping it to avoid breaking changes
   runIndex,
   setRunIndex,
 }: IRunTableProperties) => {
   const [sortState, setSortState] = useState<SortState | null>(null);
 
-  const sortKeys = React.useMemo(() => {
-    const keys = ['KM', 'Elevation Gain', 'Pace', 'BPM', 'Time', 'Date'];
-    return SHOW_ELEVATION_GAIN ? keys : keys.filter((key) => key !== 'Elevation Gain');
+  const sortKeys = useMemo(() => {
+    const keys = [DIST_UNIT, 'Elev', 'Pace', 'BPM', 'Time', 'Date'];
+    return SHOW_ELEVATION_GAIN ? keys : keys.filter((key) => key !== 'Elev');
   }, []);
 
-  const getSortFunction = React.useCallback(
+  const getSortFunction = useCallback(
     (key: string, direction: SortDirection): SortFunc | undefined => {
       const multiplier = direction === 'ascending' ? 1 : -1;
 
-      if (key === 'KM') {
+      if (key === DIST_UNIT) {
         return (a, b) => (a.distance - b.distance) * multiplier;
       }
-      if (key === 'Elevation Gain') {
+      if (key === 'Elev') {
         return (a, b) =>
           ((a.elevation_gain ?? 0) - (b.elevation_gain ?? 0)) * multiplier;
       }
@@ -76,7 +74,7 @@ const RunTable = ({
     []
   );
 
-  const displayedRuns = React.useMemo(() => {
+  const displayedRuns = useMemo(() => {
     if (!sortState) return runs;
 
     const sortFunction = getSortFunction(sortState.key, sortState.direction);
@@ -85,12 +83,12 @@ const RunTable = ({
     return runs.slice().sort(sortFunction);
   }, [getSortFunction, runs, sortState]);
 
-  const runIndexById = React.useMemo(
+  const runIndexById = useMemo(
     () => new Map(runs.map((run, index) => [run.run_id, index])),
     [runs]
   );
 
-  const handleClick = React.useCallback(
+  const handleClick = useCallback(
     (key: string) => {
       setRunIndex(-1);
       setSortState((currentState) => {
@@ -102,10 +100,8 @@ const RunTable = ({
 
         return { key, direction: nextDirection };
       });
-      // to support legacy setActivity prop behavior if relied upon
-      setActivity(runs);
     },
-    [setRunIndex, setActivity, runs]
+    [setRunIndex]
   );
 
   return (
@@ -115,7 +111,14 @@ const RunTable = ({
           <tr>
             <th />
             {sortKeys.map((k) => (
-              <th key={k} onClick={() => handleClick(k)}>
+              <th
+                key={k}
+                aria-sort={
+                  sortState?.key === k ? sortState.direction : undefined
+                }
+                className={styles.sortableHeader}
+                onClick={() => handleClick(k)}
+              >
                 {k}
               </th>
             ))}
@@ -142,4 +145,3 @@ const RunTable = ({
 };
 
 export default RunTable;
-

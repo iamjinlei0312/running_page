@@ -1,23 +1,23 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
+import styles from './style.module.css';
 
 interface YearSummaryModalProps {
   year: string;
   onClose: () => void;
 }
 
+const yearSummarySvgs = Object.fromEntries(
+  Object.keys(yearSummaryStats).map((path) => [
+    path,
+    lazy(() => loadSvgComponent(yearSummaryStats, path)),
+  ])
+);
+
 const YearSummaryModal = ({ year, onClose }: YearSummaryModalProps) => {
   const [mounted, setMounted] = useState(false);
-
-  // Memoize the lazy component to prevent re-creation on each render
-  const YearSummarySVG = useMemo(
-    () =>
-      lazy(() =>
-        loadSvgComponent(yearSummaryStats, `./year_summary_${year}.svg`)
-      ),
-    [year]
-  );
+  const YearSummarySVG = yearSummarySvgs[`./year_summary_${year}.svg`];
 
   // Trigger animation after mount
   useEffect(() => {
@@ -48,27 +48,25 @@ const YearSummaryModal = ({ year, onClose }: YearSummaryModalProps) => {
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+      className={`${styles.overlay} transition-opacity duration-300 ease-out ${
         mounted ? 'opacity-100' : 'opacity-0'
       }`} 
       onClick={onClose}
     >
       <div 
-        className={`relative flex h-full w-full items-center justify-center transition-all duration-300 ease-out ${
+        className={`${styles.modal} transition-all duration-300 ease-out ${
           mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         }`} 
         onClick={(e) => e.stopPropagation()}
       >
-        <button 
-          className="absolute top-6 right-8 z-10 text-5xl font-light text-gray-400 transition-colors hover:text-white" 
-          onClick={onClose}
-          aria-label="Close"
-        >
-          &times;
+        <button className={styles.closeButton} onClick={onClose}>
+          ×
         </button>
-        <Suspense fallback={<div className="p-10 text-center text-gray-400 animate-pulse">Loading Summary...</div>}>
-          <YearSummarySVG className="h-[90vh] w-auto max-w-[95vw] block" />
-        </Suspense>
+        {YearSummarySVG && (
+          <Suspense fallback={<div className={styles.loading}>Loading...</div>}>
+            <YearSummarySVG className={styles.svg} />
+          </Suspense>
+        )}
       </div>
     </div>
   );
