@@ -35,7 +35,7 @@ interface YearStatAccumulator {
   totalSecondsForPace: number;
 }
 
-interface YearStatSummary {
+export interface YearStatSummary {
   averageHeartRate: string;
   averagePace: string;
   hasHeartRate: boolean;
@@ -104,7 +104,7 @@ const finalizeYearStat = (
 
 const yearStatCache = new WeakMap<Activity[], Map<string, YearStatSummary>>();
 
-const getYearStatSummaries = (activityData: Activity[]) => {
+export const getYearStatSummaries = (activityData: Activity[]) => {
   const cachedSummaries = yearStatCache.get(activityData);
   if (cachedSummaries) return cachedSummaries;
 
@@ -130,13 +130,19 @@ const getYearStatSummaries = (activityData: Activity[]) => {
   return summaries;
 };
 
+interface YearStatProps {
+  year: string;
+  onClick: (_year: string) => void;
+  isSelected?: boolean;
+  isMobile?: boolean;
+}
+
 const YearStat = ({
   year,
   onClick,
-}: {
-  year: string;
-  onClick: (_year: string) => void;
-}) => {
+  isSelected = false,
+  isMobile = false,
+}: YearStatProps) => {
   const { activities } = useActivities();
   // for hover
   const [hovered, eventHandlers] = useHover();
@@ -151,13 +157,18 @@ const YearStat = ({
 
   return (
     <div
-      className="-mx-4 cursor-pointer rounded-xl border border-transparent px-4 py-3 transition-all duration-300 ease-in-out hover:border-black/5 hover:bg-black/5 dark:hover:border-white/5 dark:hover:bg-white/5"
+      className={`-mx-4 cursor-pointer rounded-xl border px-4 py-3 transition-all duration-300 ease-in-out ${
+        isSelected
+          ? 'border-black/10 bg-black/5 shadow-sm dark:border-white/10 dark:bg-white/5'
+          : 'border-transparent hover:border-black/5 hover:bg-black/5 dark:hover:border-white/5 dark:hover:bg-white/5'
+      }`}
       onClick={() => onClick(year)}
+      {...(!isMobile ? eventHandlers : {})}
     >
-      <section className="relative" {...eventHandlers}>
+      <section className="relative">
         {year !== 'Total' && (
           <button
-            className="absolute top-2 right-0 z-10 mr-2 rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white lg:mr-0"
+            className="absolute top-2 right-0 z-10 mr-2 hidden rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white lg:mr-0 lg:block"
             onClick={(e) => {
               e.stopPropagation();
               setIsModalOpen(true);
@@ -184,10 +195,10 @@ const YearStat = ({
           />
         )}
       </section>
-      {year !== 'Total' && YearSVG && GithubYearSVG && (
+      {year !== 'Total' && YearSVG && GithubYearSVG && !isMobile && (
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            hovered
+            hovered || isSelected
               ? 'mt-2 mb-4 max-h-[500px] opacity-100'
               : 'mt-0 mb-0 max-h-0 opacity-0'
           }`}

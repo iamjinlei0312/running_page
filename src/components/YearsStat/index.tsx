@@ -1,7 +1,24 @@
-import { useMemo } from 'react';
-import YearStat from '@/components/YearStat';
+import { useMemo, useState, useEffect, lazy } from 'react';
+import YearStat, { getYearStatSummaries } from '@/components/YearStat';
 import useActivities from '@/hooks/useActivities';
 import { INFO_MESSAGE } from '@/utils/const';
+import BottomSheet from '@/components/BottomSheet';
+import { yearStats, githubYearStats } from '@assets/index';
+import { loadSvgComponent } from '@/utils/svgUtils';
+
+const yearSvgs = Object.fromEntries(
+  Object.keys(yearStats).map((path) => [
+    path,
+    lazy(() => loadSvgComponent(yearStats, path)),
+  ])
+);
+
+const githubYearSvgs = Object.fromEntries(
+  Object.keys(githubYearStats).map((path) => [
+    path,
+    lazy(() => loadSvgComponent(githubYearStats, path)),
+  ])
+);
 
 const YearsStat = ({
   year,
@@ -10,21 +27,57 @@ const YearsStat = ({
   year: string;
   onClick: (_year: string) => void;
 }) => {
-  const { years } = useActivities();
+  const { activities, years } = useActivities();
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(max-width: 1023px)').matches;
+    }
+    return false;
+  });
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const [selectedYearForSheet, setSelectedYearForSheet] = useState<
+    string | null
+  >(null);
 
-  // Memoize the years array calculation
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1023px)');
+    const listener = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+    };
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
+
+  // Memoize the years array calculation - stable descending order with Total at the top
   const yearsArrayUpdate = useMemo(() => {
-    // make sure the year click on front
-    let updatedYears = years.slice();
-    updatedYears.push('Total');
-    updatedYears = updatedYears.filter((x) => x !== year);
-    updatedYears.unshift(year);
-    return updatedYears;
-  }, [years, year]);
+    return ['Total', ...years];
+  }, [years]);
 
   const infoMessage = useMemo(() => {
     return INFO_MESSAGE(years.length, year);
   }, [years.length, year]);
+
+  const handleYearClick = (yearItem: string) => {
+    onClick(yearItem);
+    if (isMobile && yearItem !== 'Total') {
+      setSelectedYearForSheet(yearItem);
+      setBottomSheetOpen(true);
+    }
+  };
+
+  // Get active summary and SVGs for BottomSheet
+  const activeSummary = useMemo(() => {
+    if (!selectedYearForSheet) return null;
+    return getYearStatSummaries(activities).get(selectedYearForSheet) || null;
+  }, [activities, selectedYearForSheet]);
+
+  const activeYearSVG = selectedYearForSheet
+    ? yearSvgs[`./year_${selectedYearForSheet}.svg`] || null
+    : null;
+
+  const activeGithubYearSVG = selectedYearForSheet
+    ? githubYearSvgs[`./github_${selectedYearForSheet}.svg`] || null
+    : null;
 
   return (
     <div className="w-full pr-16 pb-16 lg:w-full lg:pr-16">
@@ -39,8 +92,25 @@ const YearsStat = ({
       </section>
       <hr />
       {yearsArrayUpdate.map((yearItem) => (
-        <YearStat key={yearItem} year={yearItem} onClick={onClick} />
+        <YearStat
+          key={yearItem}
+          year={yearItem}
+          onClick={handleYearClick}
+          isSelected={yearItem === year}
+          isMobile={isMobile}
+        />
       ))}
+
+      {selectedYearForSheet && activeSummary && (
+        <BottomSheet
+          isOpen={bottomSheetOpen}
+          onClose={() => setBottomSheetOpen(false)}
+          year={selectedYearForSheet}
+          YearSVG={activeYearSVG}
+          GithubYearSVG={activeGithubYearSVG}
+          summary={activeSummary}
+        />
+      )}
     </div>
   );
 };
