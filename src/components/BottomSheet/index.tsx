@@ -109,6 +109,16 @@ const BottomSheet = ({
               <span className={styles.statVal}>{summary.averagePace}</span>
               <span className={styles.statLbl}>Avg Pace</span>
             </div>
+            <div className={styles.statBox}>
+              <span className={styles.statVal}>{summary.streak} day</span>
+              <span className={styles.statLbl}>Streak</span>
+            </div>
+            {summary.hasHeartRate && (
+              <div className={styles.statBox}>
+                <span className={styles.statVal}>{summary.averageHeartRate}</span>
+                <span className={styles.statLbl}>Avg BPM</span>
+              </div>
+            )}
           </div>
           <div className={styles.chartsContainer}>
             <Suspense

@@ -112,7 +112,12 @@ const getProcessedActivities = (activityData: Activity[]) => {
 
 const useActivities = () => {
   const activityData = getActivityData();
-  return useMemo(() => getProcessedActivities(activityData), [activityData]);
+  const runActivities = useMemo(() => {
+    return activityData.filter(
+      (r) => r.type === 'Run' || r.type === 'VirtualRun'
+    );
+  }, [activityData]);
+  return useMemo(() => getProcessedActivities(runActivities), [runActivities]);
 };
 
 export default useActivities;
