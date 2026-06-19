@@ -4,7 +4,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #222222;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +17,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: #222222;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
