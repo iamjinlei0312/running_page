@@ -51,7 +51,7 @@ const YearsStat = ({
   // Memoize the years array calculation - stable chronological on mobile, shuffling on desktop
   const yearsArrayUpdate = useMemo(() => {
     if (isMobile) {
-      return ['Total', ...years];
+      return [...years, 'Total'];
     }
     // Desktop: click year card to move it to the top
     let updatedYears = years.slice();
