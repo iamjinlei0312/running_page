@@ -130,119 +130,6 @@ const getYearStatSummaries = (activityData: Activity[]) => {
   return summaries;
 };
 
-const yearSvgs: Record<string, React.LazyExoticComponent<any>> = Object.fromEntries(
-  Object.keys(yearStats).map((path) => [
-    path,
-    lazy(() => loadSvgComponent(yearStats, path)),
-  ])
-);
-
-interface YearStatAccumulator {
-  averageHeartRateTotal: number;
-  heartRateNullCount: number;
-  runCount: number;
-  streak: number;
-  totalDistance: number;
-  totalElevationGain: number;
-  totalMetersForPace: number;
-  totalSecondsForPace: number;
-}
-
-interface YearStatSummary {
-  averageHeartRate: string;
-  averagePace: string;
-  hasHeartRate: boolean;
-  runCount: number;
-  streak: number;
-  totalDistance: number;
-  totalElevationGain: string;
-}
-
-const createAccumulator = (): YearStatAccumulator => ({
-  averageHeartRateTotal: 0,
-  heartRateNullCount: 0,
-  runCount: 0,
-  streak: 0,
-  totalDistance: 0,
-  totalElevationGain: 0,
-  totalMetersForPace: 0,
-  totalSecondsForPace: 0,
-});
-
-const addRunToAccumulator = (
-  accumulator: YearStatAccumulator,
-  run: Activity
-) => {
-  accumulator.runCount += 1;
-  accumulator.totalDistance += run.distance || 0;
-  accumulator.totalElevationGain += run.elevation_gain || 0;
-
-  if (run.average_speed) {
-    accumulator.totalMetersForPace += run.distance || 0;
-    accumulator.totalSecondsForPace += (run.distance || 0) / run.average_speed;
-  }
-
-  if (run.average_heartrate) {
-    accumulator.averageHeartRateTotal += run.average_heartrate;
-  } else {
-    accumulator.heartRateNullCount += 1;
-  }
-
-  if (run.streak) {
-    accumulator.streak = Math.max(accumulator.streak, run.streak);
-  }
-};
-
-const finalizeYearStat = (
-  accumulator: YearStatAccumulator
-): YearStatSummary => {
-  const heartRateCount = accumulator.runCount - accumulator.heartRateNullCount;
-
-  return {
-    averageHeartRate: (
-      accumulator.averageHeartRateTotal / heartRateCount
-    ).toFixed(0),
-    averagePace: formatPace(
-      accumulator.totalMetersForPace / accumulator.totalSecondsForPace
-    ),
-    hasHeartRate: accumulator.averageHeartRateTotal !== 0,
-    runCount: accumulator.runCount,
-    streak: accumulator.streak,
-    totalDistance: parseFloat(
-      (accumulator.totalDistance / 1000.0).toFixed(1)
-    ),
-    totalElevationGain: accumulator.totalElevationGain.toFixed(0),
-  };
-};
-
-const yearStatCache = new WeakMap<Activity[], Map<string, YearStatSummary>>();
-
-const getYearStatSummaries = (activityData: Activity[]) => {
-  const cachedSummaries = yearStatCache.get(activityData);
-  if (cachedSummaries) return cachedSummaries;
-
-  const accumulators = new Map<string, YearStatAccumulator>();
-  accumulators.set('Total', createAccumulator());
-
-  activityData.forEach((run) => {
-    const year = run.start_date_local.slice(0, 4);
-    if (!accumulators.has(year)) {
-      accumulators.set(year, createAccumulator());
-    }
-    addRunToAccumulator(accumulators.get('Total')!, run);
-    addRunToAccumulator(accumulators.get(year)!, run);
-  });
-
-  const summaries = new Map(
-    Array.from(accumulators, ([year, accumulator]) => [
-      year,
-      finalizeYearStat(accumulator),
-    ])
-  );
-  yearStatCache.set(activityData, summaries);
-  return summaries;
-};
-
 const YearStat = ({
   year,
   onClick,
@@ -264,13 +151,13 @@ const YearStat = ({
 
   return (
     <div
-      className="cursor-pointer px-4 py-3 -mx-4 rounded-xl border border-transparent transition-all duration-300 ease-in-out hover:bg-black/5 hover:border-black/5 dark:hover:bg-white/5 dark:hover:border-white/5"
+      className="-mx-4 cursor-pointer rounded-xl border border-transparent px-4 py-3 transition-all duration-300 ease-in-out hover:border-black/5 hover:bg-black/5 dark:hover:border-white/5 dark:hover:bg-white/5"
       onClick={() => onClick(year)}
     >
       <section className="relative" {...eventHandlers}>
         {year !== 'Total' && (
-          <button 
-            className="absolute right-0 top-2 z-10 mr-2 rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white lg:mr-0"
+          <button
+            className="absolute top-2 right-0 z-10 mr-2 rounded bg-gray-800/50 px-2 py-1 text-xs font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white lg:mr-0"
             onClick={(e) => {
               e.stopPropagation();
               setIsModalOpen(true);
@@ -300,17 +187,27 @@ const YearStat = ({
       {year !== 'Total' && YearSVG && GithubYearSVG && (
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            hovered ? 'max-h-[500px] opacity-100 mt-2 mb-4' : 'max-h-0 opacity-0 mt-0 mb-0'
+            hovered
+              ? 'mt-2 mb-4 max-h-[500px] opacity-100'
+              : 'mt-0 mb-0 max-h-0 opacity-0'
           }`}
         >
-          <Suspense fallback={<div className="text-xs text-gray-500 animate-pulse">loading...</div>}>
+          <Suspense
+            fallback={
+              <div className="animate-pulse text-xs text-gray-500">
+                loading...
+              </div>
+            }
+          >
             <YearSVG className="year-svg h-4/6 w-4/6 border-0 p-0" />
             <GithubYearSVG className="github-year-svg my-4 h-auto w-full border-0 p-0" />
           </Suspense>
         </div>
       )}
       <hr />
-      {isModalOpen && <YearSummaryModal year={year} onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <YearSummaryModal year={year} onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 };

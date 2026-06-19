@@ -22,7 +22,9 @@ const Stat = ({
       <span className={`${mobileTextClass} lg:${textClass} font-bold italic`}>
         {intComma(value.toString())}
       </span>
-      <span className="text-sm font-semibold italic lg:text-lg">{description}</span>
+      <span className="text-sm font-semibold italic lg:text-lg">
+        {description}
+      </span>
     </div>
   );
 };

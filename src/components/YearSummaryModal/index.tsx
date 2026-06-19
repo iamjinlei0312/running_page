@@ -47,16 +47,16 @@ const YearSummaryModal = ({ year, onClose }: YearSummaryModalProps) => {
   }, []);
 
   return (
-    <div 
+    <div
       className={`${styles.overlay} transition-opacity duration-300 ease-out ${
         mounted ? 'opacity-100' : 'opacity-0'
-      }`} 
+      }`}
       onClick={onClose}
     >
-      <div 
+      <div
         className={`${styles.modal} transition-all duration-300 ease-out ${
-          mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-        }`} 
+          mounted ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <button className={styles.closeButton} onClick={onClose}>
