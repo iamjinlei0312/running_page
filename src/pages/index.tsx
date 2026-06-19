@@ -405,6 +405,12 @@ const Index = () => {
 
   const { theme } = useTheme();
 
+  const isLocationStat =
+    (viewState.zoom ?? 0) <= 3 ||
+    year === 'Total' ||
+    currentFilter.func === filterCityRuns ||
+    currentFilter.func === filterTitleRuns;
+
   return (
     <Layout>
       <Helmet>
@@ -414,7 +420,7 @@ const Index = () => {
         <h1 className="my-12 mt-6 text-3xl font-extrabold italic lg:text-5xl">
           <a href={siteUrl}>{siteTitle}</a>
         </h1>
-        {(viewState.zoom ?? 0) <= 3 && IS_CHINESE ? (
+        {isLocationStat && IS_CHINESE ? (
           <LocationStat
             changeYear={changeYear}
             changeCity={changeCity}

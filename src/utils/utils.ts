@@ -82,6 +82,9 @@ const formatRunTime = (moving_time: string): string => {
 
 // for scroll to the map
 const scrollToMap = () => {
+  if (typeof window === 'undefined' || window.innerWidth >= 1024) {
+    return;
+  }
   const mapContainer = document.getElementById('map-container');
   if (mapContainer) {
     mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
