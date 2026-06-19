@@ -20,6 +20,11 @@ const BottomSheet = ({
 }: BottomSheetProps) => {
   const [animate, setAnimate] = useState(false);
 
+  // Touch gesture state for dragging down to close
+  const [startY, setStartY] = useState(0);
+  const [currentY, setCurrentY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
   useEffect(() => {
     if (!isOpen) return;
     document.body.style.overflow = 'hidden';
@@ -33,6 +38,38 @@ const BottomSheet = ({
 
   if (!isOpen) return null;
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartY(e.touches[0].clientY);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const deltaY = e.touches[0].clientY - startY;
+    // Only allow dragging downwards (positive deltaY)
+    if (deltaY > 0) {
+      setCurrentY(deltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    // If dragged down past 100px, trigger close. Otherwise bounce back.
+    if (currentY > 100) {
+      onClose();
+    }
+    setCurrentY(0);
+  };
+
+  // Inline style for dynamic dragging transform
+  const transformStyle =
+    isDragging || currentY > 0
+      ? {
+          transform: `translateY(${currentY}px)`,
+          transition: 'none', // Disable transition during drag for 1:1 responsiveness
+        }
+      : undefined;
+
   return (
     <div
       className={`${styles.overlay} ${animate ? styles.overlayActive : ''}`}
@@ -40,9 +77,16 @@ const BottomSheet = ({
     >
       <div
         className={`${styles.sheet} ${animate ? styles.sheetActive : ''}`}
+        style={transformStyle}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={styles.header} onClick={onClose}>
+        <div
+          className={styles.header}
+          onClick={onClose}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className={styles.handle} />
         </div>
         <div className={styles.content}>

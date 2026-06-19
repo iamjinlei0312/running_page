@@ -38,12 +38,13 @@
 }
 
 .header {
-  height: 24px;
+  height: 36px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  touch-action: none;
 }
 
 .handle {

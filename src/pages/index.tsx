@@ -435,7 +435,19 @@ const Index = () => {
           animationTrigger={animationTrigger}
         />
         {year === 'Total' ? (
-          <SVGStat />
+          <>
+            <div className="hidden lg:block">
+              <SVGStat />
+            </div>
+            <div className="block lg:hidden">
+              <RunTable
+                runs={runs}
+                locateActivity={locateActivity}
+                runIndex={runIndex}
+                setRunIndex={setRunIndex}
+              />
+            </div>
+          </>
         ) : (
           <RunTable
             runs={runs}

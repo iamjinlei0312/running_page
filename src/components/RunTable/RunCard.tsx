@@ -1,12 +1,5 @@
-import {
-  formatPace,
-  titleForRun,
-  formatRunTime,
-  Activity,
-  RunIds,
-} from '@/utils/utils';
-import { SHOW_ELEVATION_GAIN } from '@/utils/const';
-import { M_TO_DIST, M_TO_ELEV } from '@/utils/utils';
+import { titleForRun, Activity, RunIds } from '@/utils/utils';
+import { M_TO_DIST } from '@/utils/utils';
 import styles from './style.module.css';
 
 interface IRunCardProperties {
@@ -25,9 +18,6 @@ const RunCard = ({
   setRunIndex,
 }: IRunCardProperties) => {
   const distance = (run.distance / M_TO_DIST).toFixed(2);
-  const paceParts = run.average_speed ? formatPace(run.average_speed) : null;
-  const heartRate = run.average_heartrate;
-  const runTime = formatRunTime(run.moving_time);
   const isSelected = runIndex === elementIndex;
 
   const handleClick = () => {
@@ -40,44 +30,39 @@ const RunCard = ({
     locateActivity([run.run_id]);
   };
 
+  // Format date to YYYY/MM/DD
+  const formattedDate = run.start_date_local
+    ? run.start_date_local.slice(0, 10).replace(/-/g, '/')
+    : '';
+
   return (
     <div
       className={`${styles.runCard} ${isSelected ? styles.selectedCard : ''}`}
       onClick={handleClick}
     >
-      <div className={styles.cardHeader}>
-        <span className={styles.cardTitle}>{titleForRun(run)}</span>
-        <span className={styles.cardDate}>{run.start_date_local}</span>
+      <div className={styles.cardLeft}>
+        <div className={styles.runIconWrapper}>
+          <svg
+            className={styles.runIcon}
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7-.9 4.7-2.9-1.2-.7 1.9 3.7 1.5z" />
+          </svg>
+        </div>
       </div>
-      <div className={styles.cardMetrics}>
-        <div className={styles.metricItem}>
-          <span className={styles.metricValue}>{distance}</span>
-          <span className={styles.metricLabel}>KM</span>
+      <div className={styles.cardMiddle}>
+        <span className={styles.cardTitle}>{titleForRun(run)}</span>
+        <span className={styles.cardDistance}>
+          {distance} <span className={styles.cardUnit}>km</span>
+        </span>
+      </div>
+      <div className={styles.cardRight}>
+        <div className={styles.cardDeviceIcons}>
+          <span className={styles.deviceIcon}>👟</span>
+          <span className={styles.deviceIcon}>⌚</span>
         </div>
-        {paceParts && (
-          <div className={styles.metricItem}>
-            <span className={styles.metricValue}>{paceParts}</span>
-            <span className={styles.metricLabel}>配速</span>
-          </div>
-        )}
-        <div className={styles.metricItem}>
-          <span className={styles.metricValue}>{runTime}</span>
-          <span className={styles.metricLabel}>用时</span>
-        </div>
-        {heartRate && (
-          <div className={styles.metricItem}>
-            <span className={styles.metricValue}>{heartRate.toFixed(0)}</span>
-            <span className={styles.metricLabel}>BPM</span>
-          </div>
-        )}
-        {SHOW_ELEVATION_GAIN && (
-          <div className={styles.metricItem}>
-            <span className={styles.metricValue}>
-              {((run.elevation_gain ?? 0) * M_TO_ELEV).toFixed(1)}
-            </span>
-            <span className={styles.metricLabel}>爬升</span>
-          </div>
-        )}
+        <span className={styles.cardDate}>{formattedDate}</span>
       </div>
     </div>
   );

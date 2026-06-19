@@ -48,10 +48,18 @@ const YearsStat = ({
     return () => mediaQuery.removeEventListener('change', listener);
   }, []);
 
-  // Memoize the years array calculation - stable descending order with Total at the top
+  // Memoize the years array calculation - stable chronological on mobile, shuffling on desktop
   const yearsArrayUpdate = useMemo(() => {
-    return ['Total', ...years];
-  }, [years]);
+    if (isMobile) {
+      return ['Total', ...years];
+    }
+    // Desktop: click year card to move it to the top
+    let updatedYears = years.slice();
+    updatedYears.push('Total');
+    updatedYears = updatedYears.filter((x) => x !== year);
+    updatedYears.unshift(year);
+    return updatedYears;
+  }, [years, year, isMobile]);
 
   const infoMessage = useMemo(() => {
     return INFO_MESSAGE(years.length, year);
