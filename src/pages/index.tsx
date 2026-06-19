@@ -198,7 +198,14 @@ const Index = () => {
       // default year
       setYear(y);
 
-      if ((viewState.zoom ?? 0) > 3 && bounds) {
+      if (y === 'Total') {
+        if (bounds) {
+          setViewState({
+            ...bounds,
+            zoom: 3,
+          });
+        }
+      } else if ((viewState.zoom ?? 0) > 3 && bounds) {
         setViewState({
           ...bounds,
         });
@@ -330,11 +337,12 @@ const Index = () => {
         setViewState((prev) => ({
           ...prev,
           ...bounds,
+          zoom: year === 'Total' ? 3 : bounds.zoom,
         }));
       });
       return () => cancelAnimationFrame(frameId);
     }
-  }, [bounds, singleRunId]);
+  }, [bounds, singleRunId, year]);
 
   // Animate geoData when runs change
   useEffect(() => {
