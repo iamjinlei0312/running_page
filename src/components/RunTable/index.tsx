@@ -10,6 +10,7 @@ import { SHOW_ELEVATION_GAIN } from '@/utils/const';
 import { DIST_UNIT } from '@/utils/utils';
 
 import RunRow from './RunRow';
+import RunCard from './RunCard';
 import styles from './style.module.css';
 
 interface IRunTableProperties {
@@ -105,41 +106,59 @@ const RunTable = ({
   );
 
   return (
-    <div className={styles.tableContainer}>
-      <table className={styles.runTable} cellSpacing="0" cellPadding="0">
-        <thead>
-          <tr>
-            <th />
-            {sortKeys.map((k) => (
-              <th
-                key={k}
-                aria-sort={
-                  sortState?.key === k ? sortState.direction : undefined
-                }
-                className={styles.sortableHeader}
-                onClick={() => handleClick(k)}
-              >
-                {k}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {displayedRuns.map((run) => {
-            const sourceIndex = runIndexById.get(run.run_id) ?? -1;
-            return (
-              <RunRow
-                key={run.run_id}
-                elementIndex={sourceIndex}
-                locateActivity={locateActivity}
-                run={run}
-                runIndex={runIndex}
-                setRunIndex={setRunIndex}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+    <div className={styles.tableWrapper}>
+      <div className={styles.tableContainer}>
+        <table className={styles.runTable} cellSpacing="0" cellPadding="0">
+          <thead>
+            <tr>
+              <th />
+              {sortKeys.map((k) => (
+                <th
+                  key={k}
+                  aria-sort={
+                    sortState?.key === k ? sortState.direction : undefined
+                  }
+                  className={styles.sortableHeader}
+                  onClick={() => handleClick(k)}
+                >
+                  {k}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {displayedRuns.map((run) => {
+              const sourceIndex = runIndexById.get(run.run_id) ?? -1;
+              return (
+                <RunRow
+                  key={run.run_id}
+                  elementIndex={sourceIndex}
+                  locateActivity={locateActivity}
+                  run={run}
+                  runIndex={runIndex}
+                  setRunIndex={setRunIndex}
+                />
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className={styles.mobileList}>
+        {displayedRuns.map((run) => {
+          const sourceIndex = runIndexById.get(run.run_id) ?? -1;
+          return (
+            <RunCard
+              key={run.run_id}
+              elementIndex={sourceIndex}
+              locateActivity={locateActivity}
+              run={run}
+              runIndex={runIndex}
+              setRunIndex={setRunIndex}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };

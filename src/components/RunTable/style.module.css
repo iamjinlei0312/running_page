@@ -1,29 +1,81 @@
 @media only screen and (max-width: 768px) {
   .tableContainer {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display: none;
   }
 
-  .runTable {
-    min-width: 650px;
-    font-size: 0.8rem;
+  .mobileList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.5rem 0 5rem 0;
+    width: 100%;
   }
 
-  .runTable th,
-  .runTable td {
-    padding: 0.25rem !important;
-    white-space: nowrap;
-    min-width: 60px;
+  .runCard {
+    background-color: transparent;
+    border: 1px solid var(--color-hr-primary);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
-  .runTable th:first-child,
-  .runTable td:first-child {
-    min-width: 100px;
+  .runCard:hover {
+    background-color: var(--color-run-row-hover-background);
   }
 
-  .runTable th:last-child,
-  .runTable td:last-child {
-    min-width: 80px;
+  .selectedCard {
+    border-color: var(--color-primary);
+    background-color: var(--color-run-row-hover-background);
+  }
+
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--color-hr-primary);
+    padding-bottom: 0.5rem;
+  }
+
+  .cardTitle {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+  }
+
+  .cardDate {
+    font-size: 0.75rem;
+    color: var(--color-run-date);
+    font-family: var(--font-mono);
+  }
+
+  .cardMetrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .metricItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .metricValue {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+  }
+
+  .metricLabel {
+    font-size: 0.65rem;
+    color: var(--color-run-date);
+    margin-top: 0.15rem;
   }
 }
 
@@ -104,6 +156,14 @@
 .tableContainer {
   width: 100%;
   overflow-x: auto;
+}
+
+.tableWrapper {
+  width: 100%;
+}
+
+.mobileList {
+  display: none;
 }
 
 .runDate {
