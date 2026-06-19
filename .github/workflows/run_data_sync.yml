@@ -63,13 +63,16 @@ jobs:
         id: setup_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: pip
-          cache-dependency-path: 'requirements.txt'
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          uv pip install . --system
 
       - name: Cache Data Files
         if: env.SAVE_DATA_IN_GITHUB_CACHE == 'true'
@@ -238,7 +241,7 @@ jobs:
       - name: Save data to parqent
         if: env.SAVE_TO_PARQENT == 'true'
         run: |
-          pip install duckdb==1.1.0
+          uv pip install duckdb==1.1.0 --system
           python run_page/save_to_parqent.py
 
       - name: Push new runs
