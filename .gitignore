@@ -39,3 +39,12 @@ imported.json
 tests/
 
 OUT_FOLDER/
+
+
+# Local agent and spec settings
+.agent/
+.agents/
+openspec
+.codex/
+.claude/
+.claude-plugin/

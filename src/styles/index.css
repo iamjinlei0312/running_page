@@ -23,6 +23,21 @@
   --font-mono: var(--font-mono);
 }
 
+:root {
+  --color-brand: #0f172a;
+  --color-secondary: #334155;
+  --color-bg: #ffffff;
+  --color-tx: #0f172a;
+  --color-hr: #e2e8f0;
+  --color-selected: #2563eb;
+  --color-run-date: #64748b;
+  --color-run-table-thead: #475569;
+  --color-run-row-hover-background: #f1f5f9;
+  --color-activity-card: #f8fafc;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     /* const nike = 'rgb(224,237,94)'; */

@@ -141,7 +141,7 @@ const YearStat = ({
 
   return (
     <div
-      className="cursor-pointer"
+      className="cursor-pointer px-4 py-3 -mx-4 rounded-xl border border-transparent transition-all duration-300 ease-in-out hover:bg-black/5 hover:border-black/5 dark:hover:bg-white/5 dark:hover:border-white/5"
       onClick={() => onClick(year)}
       {...eventHandlers}
     >
@@ -169,10 +169,16 @@ const YearStat = ({
           <Stat value={summary.averageHeartRate} description=" Avg Heart Rate" />
         )}
       </section>
-      {year !== 'Total' && hovered && YearSVG && (
-        <Suspense fallback="loading...">
-          <YearSVG className="my-4 h-4/6 w-4/6 border-0 p-0" />
-        </Suspense>
+      {year !== 'Total' && YearSVG && (
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            hovered ? 'max-h-96 opacity-100 mt-2 mb-4' : 'max-h-0 opacity-0 mt-0 mb-0'
+          }`}
+        >
+          <Suspense fallback={<div className="text-xs text-gray-500 animate-pulse">loading...</div>}>
+            <YearSVG className="h-4/6 w-4/6 border-0 p-0" />
+          </Suspense>
+        </div>
       )}
       <hr />
       {isModalOpen && <YearSummaryModal year={year} onClose={() => setIsModalOpen(false)} />}

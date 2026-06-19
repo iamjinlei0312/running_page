@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
 
@@ -8,6 +8,8 @@ interface YearSummaryModalProps {
 }
 
 const YearSummaryModal = ({ year, onClose }: YearSummaryModalProps) => {
+  const [mounted, setMounted] = useState(false);
+
   // Memoize the lazy component to prevent re-creation on each render
   const YearSummarySVG = useMemo(
     () =>
@@ -16,6 +18,14 @@ const YearSummaryModal = ({ year, onClose }: YearSummaryModalProps) => {
       ),
     [year]
   );
+
+  // Trigger animation after mount
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setMounted(true);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, []);
 
   // Close on escape key
   useEffect(() => {
@@ -38,11 +48,15 @@ const YearSummaryModal = ({ year, onClose }: YearSummaryModalProps) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm" 
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+        mounted ? 'opacity-100' : 'opacity-0'
+      }`} 
       onClick={onClose}
     >
       <div 
-        className="relative flex h-full w-full items-center justify-center" 
+        className={`relative flex h-full w-full items-center justify-center transition-all duration-300 ease-out ${
+          mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        }`} 
         onClick={(e) => e.stopPropagation()}
       >
         <button 

@@ -61,6 +61,7 @@
 
 .runRow {
   cursor: pointer;
+  transition: background-color 0.2s ease-out;
   :is(td) {
     padding: 0.5rem;
     border: 0;
