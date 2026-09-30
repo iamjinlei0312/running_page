@@ -1,24 +1,9 @@
-import { useMemo, useState, useEffect, lazy } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import YearStat, { getYearStatSummaries } from '@/components/YearStat';
 import useActivities from '@/hooks/useActivities';
 import { INFO_MESSAGE } from '@/utils/const';
 import BottomSheet from '@/components/BottomSheet';
-import { yearStats, githubYearStats } from '@assets/index';
-import { loadSvgComponent } from '@/utils/svgUtils';
-
-const yearSvgs = Object.fromEntries(
-  Object.keys(yearStats).map((path) => [
-    path,
-    lazy(() => loadSvgComponent(yearStats, path)),
-  ])
-);
-
-const githubYearSvgs = Object.fromEntries(
-  Object.keys(githubYearStats).map((path) => [
-    path,
-    lazy(() => loadSvgComponent(githubYearStats, path)),
-  ])
-);
+import YearDetails from '@/components/YearDetails';
 
 const YearsStat = ({
   year,
@@ -79,14 +64,6 @@ const YearsStat = ({
     return getYearStatSummaries(activities).get(selectedYearForSheet) || null;
   }, [activities, selectedYearForSheet]);
 
-  const activeYearSVG = selectedYearForSheet
-    ? yearSvgs[`./year_${selectedYearForSheet}.svg`] || null
-    : null;
-
-  const activeGithubYearSVG = selectedYearForSheet
-    ? githubYearSvgs[`./github_${selectedYearForSheet}.svg`] || null
-    : null;
-
   return (
     <div className="w-full pr-16 pb-16 lg:w-full lg:pr-16">
       <section className="pb-0">
@@ -113,11 +90,10 @@ const YearsStat = ({
         <BottomSheet
           isOpen={bottomSheetOpen}
           onClose={() => setBottomSheetOpen(false)}
-          year={selectedYearForSheet}
-          YearSVG={activeYearSVG}
-          GithubYearSVG={activeGithubYearSVG}
-          summary={activeSummary}
-        />
+          title={`${selectedYearForSheet} 年度详情`}
+        >
+          <YearDetails year={selectedYearForSheet} />
+        </BottomSheet>
       )}
     </div>
   );

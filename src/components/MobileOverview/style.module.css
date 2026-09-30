@@ -1,0 +1,60 @@
+@reference '../../styles/index.css';
+
+.overview {
+  display: none;
+}
+
+@variant max-lg {
+  .overview {
+    @apply mb-4 block;
+  }
+  .toolbar {
+    @apply flex flex-wrap items-center justify-between gap-2;
+  }
+  .toolbar select,
+  .actions button {
+    @apply border-run-date/25 bg-activity-card text-text-primary min-h-11 cursor-pointer rounded-xl border px-3 py-2;
+  }
+  .actions {
+    @apply flex gap-2;
+  }
+  .metrics {
+    @apply mt-4 mb-3 flex flex-wrap gap-3;
+  }
+  .metrics > div {
+    @apply min-w-0 flex-1 basis-20;
+  }
+  .metrics dt {
+    @apply text-run-date mb-1 text-xs;
+  }
+  .metrics dd {
+    @apply font-mono text-2xl font-extrabold wrap-anywhere;
+  }
+  .introduction {
+    @apply text-run-date text-sm;
+  }
+  .introduction summary {
+    @apply cursor-pointer py-2;
+  }
+  .introduction p {
+    @apply my-3 leading-relaxed;
+  }
+  .activeFilter {
+    @apply mt-3 flex items-center justify-between gap-2 text-sm;
+  }
+  .activeFilter button {
+    @apply text-selected min-h-11 px-3;
+  }
+  .filters {
+    @apply flex flex-col gap-2;
+  }
+  .filters h3 {
+    @apply mt-4 font-bold;
+  }
+  .filters button {
+    @apply border-run-date/25 bg-activity-card flex min-h-11 cursor-pointer justify-between gap-4 rounded-xl border p-3 text-left;
+  }
+  .filters button[aria-pressed='true'] {
+    @apply border-selected;
+  }
+}

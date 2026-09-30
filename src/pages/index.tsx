@@ -14,6 +14,7 @@ import RunMap from '@/components/RunMap';
 import RunTable from '@/components/RunTable';
 import SVGStat from '@/components/SVGStat';
 import YearsStat from '@/components/YearsStat';
+import MobileOverview from '@/components/MobileOverview';
 import useActivities from '@/hooks/useActivities';
 import getSiteMetadata from '@/hooks/useSiteMetadata';
 import { useInterval } from '@/hooks/useInterval';
@@ -180,7 +181,6 @@ const Index = () => {
       name: string,
       func: (_run: Activity, _value: string) => boolean
     ) => {
-      scrollToMap();
       if (name != 'Year') {
         setYear(thisYear);
       }
@@ -424,21 +424,33 @@ const Index = () => {
       <Helmet>
         <html lang="en" data-theme={theme} />
       </Helmet>
-      <div className="w-full lg:w-1/3">
-        <h1 className="my-12 mt-6 text-3xl font-extrabold italic lg:text-5xl">
+      <div className="w-full min-w-0 lg:w-1/3">
+        <h1 className="mt-2 mb-5 text-3xl font-extrabold italic lg:my-12 lg:mt-6 lg:text-5xl">
           <a href={siteUrl}>{siteTitle}</a>
         </h1>
-        {isLocationStat && IS_CHINESE ? (
-          <LocationStat
-            changeYear={changeYear}
-            changeCity={changeCity}
-            changeTitle={changeTitle}
-          />
-        ) : (
-          <YearsStat year={year} onClick={changeYear} />
-        )}
+        <MobileOverview
+          year={year}
+          runs={runs}
+          filterLabel={currentFilter.item}
+          isYearFilter={currentFilter.func === filterYearRuns}
+          changeYear={changeYear}
+          changeCity={changeCity}
+          changeTitle={changeTitle}
+          locateActivity={locateActivity}
+        />
+        <div className="hidden lg:block">
+          {isLocationStat && IS_CHINESE ? (
+            <LocationStat
+              changeYear={changeYear}
+              changeCity={changeCity}
+              changeTitle={changeTitle}
+            />
+          ) : (
+            <YearsStat year={year} onClick={changeYear} />
+          )}
+        </div>
       </div>
-      <div className="w-full lg:w-2/3" id="map-container">
+      <div className="w-full min-w-0 scroll-mt-4 lg:w-2/3" id="map-container">
         <RunMap
           title={title}
           viewState={viewState}

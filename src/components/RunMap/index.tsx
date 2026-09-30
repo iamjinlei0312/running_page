@@ -23,7 +23,6 @@ import {
   COUNTRY_FILL_COLOR,
   USE_DASH_LINE,
   LINE_OPACITY,
-  MAP_HEIGHT,
   PRIVACY_MODE,
   LIGHTS_ON,
   MAP_TILE_VENDOR,
@@ -363,7 +362,7 @@ const RunMap = ({
   const style: React.CSSProperties = useMemo(
     () => ({
       width: '100%',
-      height: MAP_HEIGHT,
+      height: '100%',
       maxWidth: '100%', // Prevent overflow on mobile
     }),
     []
@@ -372,7 +371,7 @@ const RunMap = ({
   const fullscreenButton: React.CSSProperties = useMemo(
     () => ({
       position: 'absolute',
-      marginTop: '29.2px',
+      marginTop: 'var(--map-fullscreen-top)',
       right: '0px',
       opacity: 0.3,
     }),
@@ -445,135 +444,146 @@ const RunMap = ({
   }, [isSingleRun, startRouteAnimation]);
 
   return (
-    <Map
-      {...viewState}
-      onMove={onMove}
-      onClick={handleMapClick}
-      style={style}
-      mapStyle={mapStyle}
-      ref={mapRefCallback}
-      cooperativeGestures={isTouchDevice()}
-      mapboxAccessToken={mapboxAccessToken}
-    >
-      {mapError && (
-        <div className={styles.mapErrorNotification}>
-          <span>⚠️ {mapError}</span>
-          <button onClick={() => window.location.reload()}>Reload Page</button>
-          <a
-            href="https://github.com/yihong0618/running_page#map-tiles-customization"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Troubleshooting Guide
-          </a>
-        </div>
-      )}
-      <RunMapButtons changeYear={changeYear} thisYear={thisYear} />
-      <Source id="data" type="geojson" data={combinedGeoData}>
-        <Layer
-          id="province"
-          type="fill"
-          paint={{
-            'fill-color': PROVINCE_FILL_COLOR,
-          }}
-          filter={filterProvinces}
-        />
-        <Layer
-          id="countries"
-          type="fill"
-          paint={{
-            'fill-color': COUNTRY_FILL_COLOR,
-            // in China, fill a bit lighter while already filled provinces
-            'fill-opacity': ['case', ['==', ['get', 'name'], '中国'], 0.1, 0.5],
-          }}
-          filter={filterCountries}
-        />
-        <Layer
-          id="runs2"
-          type="line"
-          paint={{
-            'line-color': ['get', 'color'],
-            'line-width': isBigMap && lights ? 1 : 2,
-            'line-dasharray': dash,
-            'line-opacity':
-              isSingleRun || isBigMap || !lights ? 1 : LINE_OPACITY,
-            'line-blur': 1,
-          }}
-          layout={{
-            'line-join': 'round',
-            'line-cap': 'round',
-          }}
-          filter={['!=', ['get', 'indoor'], true]}
-        />
-        <Layer
-          id="runs2-indoor"
-          type="line"
-          paint={{
-            'line-color': ['get', 'color'],
-            'line-width': isBigMap && lights ? 1 : 2,
-            'line-dasharray': [4, 3],
-            'line-opacity':
-              isSingleRun || isBigMap || !lights ? 0.6 : LINE_OPACITY * 0.6,
-            'line-blur': 1,
-          }}
-          layout={{
-            'line-join': 'round',
-            'line-cap': 'round',
-          }}
-          filter={['==', ['get', 'indoor'], true]}
-        />
-      </Source>
-      {isSingleRun && animatedPoints.length > 0 && (
-        <Source
-          id="animated-run"
-          type="geojson"
-          data={{
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                properties: { color: singleRunColor },
-                geometry: {
-                  type: 'LineString',
-                  coordinates: animatedPoints,
-                },
-              },
-            ],
-          }}
-        >
+    <div className={styles.map}>
+      <Map
+        {...viewState}
+        onMove={onMove}
+        onClick={handleMapClick}
+        style={style}
+        mapStyle={mapStyle}
+        ref={mapRefCallback}
+        cooperativeGestures={isTouchDevice()}
+        mapboxAccessToken={mapboxAccessToken}
+      >
+        {mapError && (
+          <div className={styles.mapErrorNotification}>
+            <span>⚠️ {mapError}</span>
+            <button onClick={() => window.location.reload()}>
+              Reload Page
+            </button>
+            <a
+              href="https://github.com/yihong0618/running_page#map-tiles-customization"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Troubleshooting Guide
+            </a>
+          </div>
+        )}
+        <RunMapButtons changeYear={changeYear} thisYear={thisYear} />
+        <Source id="data" type="geojson" data={combinedGeoData}>
           <Layer
-            id="animated-run"
+            id="province"
+            type="fill"
+            paint={{
+              'fill-color': PROVINCE_FILL_COLOR,
+            }}
+            filter={filterProvinces}
+          />
+          <Layer
+            id="countries"
+            type="fill"
+            paint={{
+              'fill-color': COUNTRY_FILL_COLOR,
+              // in China, fill a bit lighter while already filled provinces
+              'fill-opacity': [
+                'case',
+                ['==', ['get', 'name'], '中国'],
+                0.1,
+                0.5,
+              ],
+            }}
+            filter={filterCountries}
+          />
+          <Layer
+            id="runs2"
             type="line"
             paint={{
               'line-color': ['get', 'color'],
-              'line-width': isIndoorRun ? 2 : 3,
-              'line-opacity': 1,
-              'line-dasharray': isIndoorRun ? [4, 3] : [2, 0],
+              'line-width': isBigMap && lights ? 1 : 2,
+              'line-dasharray': dash,
+              'line-opacity':
+                isSingleRun || isBigMap || !lights ? 1 : LINE_OPACITY,
+              'line-blur': 1,
             }}
             layout={{
               'line-join': 'round',
               'line-cap': 'round',
             }}
+            filter={['!=', ['get', 'indoor'], true]}
+          />
+          <Layer
+            id="runs2-indoor"
+            type="line"
+            paint={{
+              'line-color': ['get', 'color'],
+              'line-width': isBigMap && lights ? 1 : 2,
+              'line-dasharray': [4, 3],
+              'line-opacity':
+                isSingleRun || isBigMap || !lights ? 0.6 : LINE_OPACITY * 0.6,
+              'line-blur': 1,
+            }}
+            layout={{
+              'line-join': 'round',
+              'line-cap': 'round',
+            }}
+            filter={['==', ['get', 'indoor'], true]}
           />
         </Source>
-      )}
-      {isSingleRun && (
-        <RunMarker
-          startLat={startLat}
-          startLon={startLon}
-          endLat={endLat}
-          endLon={endLon}
+        {isSingleRun && animatedPoints.length > 0 && (
+          <Source
+            id="animated-run"
+            type="geojson"
+            data={{
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: { color: singleRunColor },
+                  geometry: {
+                    type: 'LineString',
+                    coordinates: animatedPoints,
+                  },
+                },
+              ],
+            }}
+          >
+            <Layer
+              id="animated-run"
+              type="line"
+              paint={{
+                'line-color': ['get', 'color'],
+                'line-width': isIndoorRun ? 2 : 3,
+                'line-opacity': 1,
+                'line-dasharray': isIndoorRun ? [4, 3] : [2, 0],
+              }}
+              layout={{
+                'line-join': 'round',
+                'line-cap': 'round',
+              }}
+            />
+          </Source>
+        )}
+        {isSingleRun && (
+          <RunMarker
+            startLat={startLat}
+            startLon={startLon}
+            endLat={endLat}
+            endLon={endLon}
+          />
+        )}
+        <span className={styles.runTitle}>{title}</span>
+        <FullscreenControl style={fullscreenButton} />
+        {!PRIVACY_MODE && (
+          <LightsControl setLights={setLights} lights={lights} />
+        )}
+        <NavigationControl
+          showCompass={false}
+          position={'bottom-right'}
+          style={{ opacity: 0.3 }}
         />
-      )}
-      <span className={styles.runTitle}>{title}</span>
-      <FullscreenControl style={fullscreenButton} />
-      {!PRIVACY_MODE && <LightsControl setLights={setLights} lights={lights} />}
-      <NavigationControl
-        showCompass={false}
-        position={'bottom-right'}
-        style={{ opacity: 0.3 }}
-      />
-    </Map>
+      </Map>
+    </div>
   );
 };
 

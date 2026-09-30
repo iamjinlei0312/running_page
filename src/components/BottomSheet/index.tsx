@@ -1,74 +1,47 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import styles from './style.module.css';
 
 interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  year: string;
-  YearSVG: React.LazyExoticComponent<any> | null;
-  GithubYearSVG: React.LazyExoticComponent<any> | null;
-  summary: any;
+  title: string;
+  children: ReactNode;
 }
 
 const BottomSheet = ({
   isOpen,
   onClose,
-  year,
-  YearSVG,
-  GithubYearSVG,
-  summary,
+  title,
+  children,
 }: BottomSheetProps) => {
   const [animate, setAnimate] = useState(false);
-
-  // Touch gesture state for dragging down to close
-  const [startY, setStartY] = useState(0);
-  const [currentY, setCurrentY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const dragStartRef = useRef<number | null>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement;
     document.body.style.overflow = 'hidden';
-    const frame = requestAnimationFrame(() => setAnimate(true));
+    const frame = requestAnimationFrame(() => {
+      setAnimate(true);
+      sheetRef.current?.focus();
+    });
     return () => {
       cancelAnimationFrame(frame);
       setAnimate(false);
-      document.body.style.overflow = '';
+      setDragOffset(0);
+      dragStartRef.current = null;
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus({ preventScroll: true });
+      }
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setStartY(e.touches[0].clientY);
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const deltaY = e.touches[0].clientY - startY;
-    // Only allow dragging downwards (positive deltaY)
-    if (deltaY > 0) {
-      setCurrentY(deltaY);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    // If dragged down past 100px, trigger close. Otherwise bounce back.
-    if (currentY > 100) {
-      onClose();
-    }
-    setCurrentY(0);
-  };
-
-  // Inline style for dynamic dragging transform
-  const transformStyle =
-    isDragging || currentY > 0
-      ? {
-          transform: `translateY(${currentY}px)`,
-          transition: 'none', // Disable transition during drag for 1:1 responsiveness
-        }
-      : undefined;
 
   return (
     <div
@@ -76,59 +49,82 @@ const BottomSheet = ({
       onClick={onClose}
     >
       <div
+        ref={sheetRef}
         className={`${styles.sheet} ${animate ? styles.sheetActive : ''}`}
-        style={transformStyle}
-        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        style={
+          dragOffset
+            ? { transform: `translateY(${dragOffset}px)`, transition: 'none' }
+            : undefined
+        }
+        onClick={(event) => event.stopPropagation()}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') onClose();
+          if (event.key !== 'Tab') return;
+          const focusable = Array.from(
+            event.currentTarget.querySelectorAll<HTMLElement>(
+              'button, a[href], select, summary, [tabindex="0"]'
+            )
+          ).filter((element) => element.getClientRects().length > 0);
+          const first = focusable[0];
+          const last = focusable.at(-1);
+          if (
+            event.shiftKey &&
+            (document.activeElement === first ||
+              document.activeElement === event.currentTarget)
+          ) {
+            event.preventDefault();
+            last?.focus();
+          } else if (
+            !event.shiftKey &&
+            (document.activeElement === last ||
+              document.activeElement === event.currentTarget)
+          ) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
       >
         <div
           className={styles.header}
-          onClick={onClose}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onTouchStart={(event) => {
+            dragStartRef.current = event.touches[0].clientY;
+          }}
+          onTouchMove={(event) => {
+            if (dragStartRef.current !== null) {
+              setDragOffset(
+                Math.max(0, event.touches[0].clientY - dragStartRef.current)
+              );
+            }
+          }}
+          onTouchEnd={() => {
+            if (dragOffset > 100) onClose();
+            dragStartRef.current = null;
+            setDragOffset(0);
+          }}
+          onTouchCancel={() => {
+            dragStartRef.current = null;
+            setDragOffset(0);
+          }}
         >
           <div className={styles.handle} />
         </div>
-        <div className={styles.content}>
-          <div className={styles.statsHeader}>
-            <span className={styles.yearTitle}>{year} Journey</span>
-            <button className={styles.closeBtn} onClick={onClose}>
-              &times;
-            </button>
-          </div>
-          <div className={styles.statsSummary}>
-            <div className={styles.statBox}>
-              <span className={styles.statVal}>{summary.runCount}</span>
-              <span className={styles.statLbl}>Runs</span>
-            </div>
-            <div className={styles.statBox}>
-              <span className={styles.statVal}>{summary.totalDistance}</span>
-              <span className={styles.statLbl}>KM</span>
-            </div>
-            <div className={styles.statBox}>
-              <span className={styles.statVal}>{summary.averagePace}</span>
-              <span className={styles.statLbl}>Avg Pace</span>
-            </div>
-            <div className={styles.statBox}>
-              <span className={styles.statVal}>{summary.streak} day</span>
-              <span className={styles.statLbl}>Streak</span>
-            </div>
-            {summary.hasHeartRate && (
-              <div className={styles.statBox}>
-                <span className={styles.statVal}>{summary.averageHeartRate}</span>
-                <span className={styles.statLbl}>Avg BPM</span>
-              </div>
-            )}
-          </div>
-          <div className={styles.chartsContainer}>
-            <Suspense
-              fallback={<div className={styles.loading}>加载中...</div>}
-            >
-              {YearSVG && <YearSVG className={styles.chartSvg} />}
-              {GithubYearSVG && <GithubYearSVG className={styles.githubSvg} />}
-            </Suspense>
-          </div>
+        <div className={styles.statsHeader}>
+          <h2 id={titleId} className={styles.yearTitle}>
+            {title}
+          </h2>
+          <button
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="关闭详情"
+          >
+            &times;
+          </button>
         </div>
+        <div className={styles.content}>{children}</div>
       </div>
     </div>
   );

@@ -107,6 +107,42 @@ const RunTable = ({
 
   return (
     <div className={styles.tableWrapper}>
+      <div className={styles.mobileToolbar}>
+        <h2>
+          跑步记录{' '}
+          <span className="text-run-date">({displayedRuns.length})</span>
+        </h2>
+        <select
+          aria-label="记录排序"
+          value={
+            sortState
+              ? `${sortState.key}:${sortState.direction}`
+              : 'Date:descending'
+          }
+          onChange={(event) => {
+            const [key, direction] = event.target.value.split(':');
+            setRunIndex(-1);
+            setSortState({ key, direction: direction as SortDirection });
+          }}
+        >
+          <option value="Date:descending">日期：最新优先</option>
+          <option value="Date:ascending">日期：最早优先</option>
+          <option value={`${DIST_UNIT}:descending`}>距离：长到短</option>
+          <option value={`${DIST_UNIT}:ascending`}>距离：短到长</option>
+          <option value="Pace:descending">配速：快到慢</option>
+          <option value="Pace:ascending">配速：慢到快</option>
+          <option value="Time:descending">时间：长到短</option>
+          <option value="Time:ascending">时间：短到长</option>
+          <option value="BPM:descending">心率：高到低</option>
+          <option value="BPM:ascending">心率：低到高</option>
+          {SHOW_ELEVATION_GAIN && (
+            <option value="Elev:descending">爬升：高到低</option>
+          )}
+          {SHOW_ELEVATION_GAIN && (
+            <option value="Elev:ascending">爬升：低到高</option>
+          )}
+        </select>
+      </div>
       <div className={styles.tableContainer}>
         <table className={styles.runTable} cellSpacing="0" cellPadding="0">
           <thead>

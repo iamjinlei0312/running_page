@@ -1,3 +1,5 @@
+@reference '../../styles/index.css';
+
 .themeButton {
   border-radius: 50%;
   transition: all 0.2s ease;
@@ -24,4 +26,57 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.nav {
+  position: relative;
+}
+.mobileMenu {
+  display: none;
+}
+
+@variant max-lg {
+  :global(html body) {
+    overflow-x: visible;
+    max-width: none;
+  }
+  .nav {
+    @apply mt-4 gap-4 px-4;
+  }
+  .logo {
+    @apply w-auto shrink-0;
+  }
+  .logo img {
+    @apply size-11;
+  }
+  .links {
+    @apply w-auto min-w-0 gap-2;
+  }
+  .links > a {
+    @apply mr-0 py-2 text-base;
+  }
+  .externalLink {
+    display: none;
+  }
+  .themeWrapper {
+    margin-left: 0;
+  }
+  .themeButton {
+    @apply size-11 shrink-0;
+  }
+  .mobileMenu {
+    display: block;
+  }
+  .mobileMenu summary {
+    @apply flex min-h-11 cursor-pointer list-none items-center px-2;
+  }
+  .mobileMenu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menuLinks {
+    @apply border-hr-primary bg-background absolute top-full right-4 z-20 mt-2 flex flex-col rounded-xl border p-2;
+  }
+  .menuLinks a {
+    @apply px-4 py-3 whitespace-nowrap;
+  }
 }

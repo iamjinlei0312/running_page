@@ -53,25 +53,31 @@ const Header = () => {
 
   return (
     <>
-      <nav className="mx-auto mt-12 flex w-full max-w-screen-2xl min-w-max items-center justify-between pl-6 lg:px-16">
-        <div className="w-1/4">
+      <nav
+        className={`${styles.nav} mx-auto mt-12 flex w-full max-w-screen-2xl items-center justify-between pl-6 lg:px-16`}
+      >
+        <div className={`${styles.logo} w-1/4`}>
           <Link to={siteUrl}>
             <picture>
               <img className="h-16 w-16 rounded-full" alt="logo" src={logo} />
             </picture>
           </Link>
         </div>
-        <div className="flex w-3/4 items-center justify-end text-right">
+        <div
+          className={`${styles.links} flex w-3/4 items-center justify-end text-right`}
+        >
           {navLinks.map((n) => (
             <a
               key={n.url}
               href={n.url}
-              className="mr-3 text-lg lg:mr-4 lg:text-base"
+              className={`${n.url.startsWith('http') ? styles.externalLink : ''} mr-3 text-lg lg:mr-4 lg:text-base`}
             >
               {n.name}
             </a>
           ))}
-          <div className="ml-4 flex items-center space-x-2">
+          <div
+            className={`${styles.themeWrapper} ml-4 flex items-center space-x-2`}
+          >
             <button
               type="button"
               onClick={handleToggle}
@@ -82,6 +88,18 @@ const Header = () => {
               <div className={styles.iconWrapper}>{icons[theme]}</div>
             </button>
           </div>
+          <details className={styles.mobileMenu}>
+            <summary aria-label="更多链接">菜单</summary>
+            <div className={styles.menuLinks}>
+              {navLinks
+                .filter((link) => link.url.startsWith('http'))
+                .map((link) => (
+                  <a key={link.url} href={link.url}>
+                    {link.name}
+                  </a>
+                ))}
+            </div>
+          </details>
         </div>
       </nav>
     </>

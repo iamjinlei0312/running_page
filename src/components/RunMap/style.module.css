@@ -1,3 +1,11 @@
+@reference '../../styles/index.css';
+
+.map {
+  --run-map-height: 600px;
+  --map-fullscreen-top: 29.2px;
+  height: var(--run-map-height);
+}
+
 .locationSVG {
   height: 100%;
   width: 100%;
@@ -60,10 +68,10 @@
 @media (min-width: 768px) {
   .runTitle {
     height: 29px;
-    width: 710px;
+    width: auto;
     bottom: 0px;
     left: 120px;
-    right: auto;
+    @apply right-2.5;
   }
 }
 
@@ -155,4 +163,33 @@
   box-sizing: border-box;
   background-color: transparent;
   cursor: pointer;
+}
+
+@variant max-lg {
+  .map {
+    --run-map-height: clamp(250px, 42svh, 400px);
+    --map-fullscreen-top: calc(var(--spacing) * 11);
+  }
+  .map:fullscreen {
+    --run-map-height: 100%;
+  }
+  .buttons {
+    display: none;
+  }
+  .runTitle {
+    @apply right-13 bottom-10 left-3 h-auto w-auto text-xs;
+  }
+  .lights {
+    @apply mt-24 h-11 w-11;
+  }
+  .lightsOn,
+  .lightsOff {
+    height: calc(var(--spacing) * 11) !important;
+  }
+  .map :global(.mapboxgl-ctrl-group > button) {
+    @apply size-11;
+  }
+  :global(.mapboxgl-ctrl-bottom-right) {
+    @apply max-w-full;
+  }
 }

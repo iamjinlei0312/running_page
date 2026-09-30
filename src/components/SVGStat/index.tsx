@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, type MouseEventHandler } from 'react';
 import { totalStat } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
 import { initSvgColorAdjustments } from '@/utils/colorUtils';
@@ -8,7 +8,13 @@ const GithubSvg = lazy(() => loadSvgComponent(totalStat, './github.svg'));
 
 const GridSvg = lazy(() => loadSvgComponent(totalStat, './grid.svg'));
 
-const SVGStat = () => {
+const SVGStat = ({
+  id = 'svgStat',
+  onClick,
+}: {
+  id?: string;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+}) => {
   useEffect(() => {
     // Initialize SVG color adjustments when component mounts
     const timer = setTimeout(() => {
@@ -19,7 +25,7 @@ const SVGStat = () => {
   }, []);
 
   return (
-    <div id="svgStat">
+    <div id={id} onClick={onClick}>
       <Suspense fallback={<div className="text-center">Loading...</div>}>
         <GithubSvg className="github-svg mt-4 h-auto w-full" />
         <GridSvg className="grid-svg mt-4 h-auto w-full" />

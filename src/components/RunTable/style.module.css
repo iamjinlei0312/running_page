@@ -1,201 +1,7 @@
-@media only screen and (max-width: 768px) {
-  .tableContainer {
-    display: none;
-  }
+@reference '../../styles/index.css';
 
-  .mobileList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    margin: 1.5rem 0 5rem 0;
-    width: 100%;
-  }
-
-  .runCard {
-    background-color: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
-    border-radius: 16px;
-    padding: 1rem 1.15rem;
-    cursor: pointer;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  :global([data-theme='dark']) .runCard {
-    background-color: #1e1e1e;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
-  }
-
-  :global([data-theme='light']) .runCard {
-    background-color: #f5f5f7;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
-  }
-
-  .runCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45);
-  }
-
-  :global([data-theme='light']) .runCard:hover {
-    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
-  }
-
-  .selectedCard {
-    border-color: var(--color-primary) !important;
-    box-shadow:
-      0 0 0 1px var(--color-primary),
-      0 10px 30px -10px rgba(224, 237, 94, 0.2) !important;
-  }
-
-  :global([data-theme='light']) .selectedCard {
-    border-color: #2563eb !important;
-    box-shadow:
-      0 0 0 1px #2563eb,
-      0 10px 30px -10px rgba(37, 99, 235, 0.2) !important;
-  }
-
-  .cardLeft {
-    display: flex;
-    align-items: center;
-  }
-
-  .runIconWrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: rgba(224, 237, 94, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  :global([data-theme='light']) .runIconWrapper {
-    background-color: rgba(37, 99, 235, 0.1);
-  }
-
-  .runIcon {
-    width: 22px;
-    height: 22px;
-    color: var(--color-primary);
-  }
-
-  :global([data-theme='light']) .runIcon {
-    color: #2563eb;
-  }
-
-  .cardMiddle {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    flex: 1;
-  }
-
-  .cardTitle {
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: #ffffff;
-  }
-
-  :global([data-theme='light']) .cardTitle {
-    color: var(--color-text-primary);
-  }
-
-  .cardDistance {
-    font-size: 1.6rem;
-    font-weight: 800;
-    font-style: italic;
-    color: var(--color-primary);
-    font-family: var(--font-mono);
-    line-height: 1.1;
-  }
-
-  :global([data-theme='light']) .cardDistance {
-    color: #2563eb;
-  }
-
-  .cardUnit {
-    font-size: 0.85rem;
-    font-weight: 500;
-    font-style: normal;
-    text-transform: lowercase;
-    margin-left: 0.15rem;
-    color: var(--color-run-date);
-  }
-
-  .cardRight {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-  }
-
-  .cardDeviceIcons {
-    display: flex;
-    gap: 0.4rem;
-  }
-
-  .deviceIcon {
-    font-size: 0.9rem;
-    opacity: 0.85;
-  }
-
-  .cardDate {
-    font-size: 0.75rem;
-    color: var(--color-run-date);
-    font-family: var(--font-mono);
-    opacity: 0.8;
-  }
-
-  .cardMain {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 1rem;
-  }
-
-  .cardStats {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding-top: 0.6rem;
-    border-top: 1px dashed rgba(255, 255, 255, 0.08);
-  }
-
-  :global([data-theme='light']) .cardStats {
-    border-top: 1px dashed rgba(15, 23, 42, 0.08);
-  }
-
-  .statItem {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-  }
-
-  .statLabel {
-    font-size: 0.7rem;
-    color: var(--color-run-date);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.15rem;
-  }
-
-  .statValue {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #ffffff;
-    font-family: var(--font-mono);
-  }
-
-  :global([data-theme='light']) .statValue {
-    color: var(--color-text-primary);
-  }
+.mobileToolbar {
+  display: none;
 }
 
 .runTable {
@@ -287,4 +93,75 @@
 
 .runDate {
   color: var(--color-run-date);
+}
+
+@variant max-lg {
+  .tableContainer {
+    display: none;
+  }
+  .mobileList {
+    @apply mt-3 mb-12 flex w-full flex-col gap-3;
+  }
+  .mobileToolbar {
+    @apply mt-6 flex flex-wrap items-center justify-between gap-2;
+  }
+  .mobileToolbar h2 {
+    @apply font-bold;
+  }
+  .mobileToolbar select {
+    @apply border-run-date/25 bg-activity-card min-h-11 min-w-0 rounded-xl border px-3 py-2 text-sm;
+  }
+  .runCard {
+    @apply border-run-date/25 bg-activity-card flex flex-col gap-3 rounded-2xl border p-4;
+  }
+  .runCard:hover {
+    transform: none;
+  }
+  :global([data-theme]) .selectedCard {
+    border-color: var(--color-selected) !important;
+    box-shadow: none !important;
+  }
+  .cardMain {
+    @apply flex min-h-11 w-full cursor-pointer flex-wrap items-center gap-3 bg-transparent text-left;
+    color: inherit;
+  }
+  .cardLeft {
+    @apply flex items-center;
+  }
+  .runIconWrapper {
+    @apply bg-primary/10 flex size-10 items-center justify-center rounded-full;
+  }
+  .runIcon {
+    @apply text-primary size-5.5;
+  }
+  .cardMiddle {
+    @apply flex min-w-0 flex-1 flex-col;
+  }
+  .cardTitle {
+    @apply text-text-primary wrap-anywhere;
+  }
+  .cardDistance {
+    @apply text-primary font-mono text-2xl font-extrabold italic;
+  }
+  .cardUnit {
+    @apply text-run-date ml-1 text-xs font-normal not-italic;
+  }
+  .cardRight {
+    @apply flex w-full items-start;
+  }
+  .cardDate {
+    @apply text-run-date font-mono text-xs;
+  }
+  .cardStats {
+    @apply border-run-date/25 flex w-full flex-wrap gap-y-3 border-t border-dashed pt-3;
+  }
+  .statItem {
+    @apply flex min-w-0 flex-1 flex-col items-center;
+  }
+  .statLabel {
+    @apply text-run-date text-xs;
+  }
+  .statValue {
+    @apply text-text-primary font-mono text-sm font-bold;
+  }
 }

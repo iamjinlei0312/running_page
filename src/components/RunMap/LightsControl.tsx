@@ -11,6 +11,8 @@ const LightsControl = ({ setLights, lights }: ILightsProps) => {
       <button
         className={`${lights ? styles.lightsOn : styles.lightsOff}`}
         onClick={() => setLights(!lights)}
+        aria-label={lights ? 'Turn off the light' : 'Turn on the light'}
+        aria-pressed={lights}
       >
         <span
           className="mapboxgl-ctrl-icon"
