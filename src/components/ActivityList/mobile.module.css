@@ -1,0 +1,45 @@
+@reference '../../styles/index.css';
+
+@variant max-lg {
+  .activityList {
+    @apply px-4 pt-5;
+  }
+  .summaryContainer {
+    --activity-single-column: 1;
+  }
+  .filterContainer {
+    @apply flex-wrap gap-2;
+  }
+  .filterContainer select,
+  .smallHomeButton {
+    @apply min-h-11;
+  }
+  .smallHomeButton {
+    @apply mr-0;
+  }
+  .summaryInner {
+    padding: 0;
+  }
+  .rowContainer {
+    padding-right: 0;
+  }
+  .activityList :global(.rc-virtual-list-holder-inner),
+  .activityList :global(.rc-virtual-list-holder) {
+    padding-right: 0;
+  }
+  .activityCard {
+    @apply w-full min-w-0 shrink-0;
+  }
+  .activityDetails p {
+    overflow-wrap: anywhere;
+  }
+  .yearSelector {
+    @apply w-full justify-start;
+  }
+  .yearButton {
+    @apply min-h-11;
+  }
+  .yearSummarySvg {
+    max-height: none;
+  }
+}

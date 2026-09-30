@@ -11,6 +11,7 @@ import React, {
 import VirtualList from 'rc-virtual-list';
 import { useNavigate } from 'react-router-dom';
 import styles from './style.module.css';
+import mobileStyles from './mobile.module.css';
 import { ACTIVITY_TOTAL, LOADING_TEXT } from '@/utils/const';
 import { totalStat, yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
@@ -414,6 +415,10 @@ function useActivityListMeasurements(itemWidth: number, gap: number) {
   const layoutFrameRef = useRef<number | null>(null);
 
   const itemsPerRowStore = useMemo(() => createSnapshotStore(0), []);
+  const cardWidthStore = useMemo(
+    () => createSnapshotStore(itemWidth),
+    [itemWidth]
+  );
   const rowHeightStore = useMemo(() => createSnapshotStore(360), []);
   const listHeightStore = useMemo(
     () => createSnapshotStore(getInitialListHeight()),
@@ -430,6 +435,11 @@ function useActivityListMeasurements(itemWidth: number, gap: number) {
     rowHeightStore.getSnapshot,
     rowHeightStore.getServerSnapshot
   );
+  const cardWidth = useSyncExternalStore(
+    cardWidthStore.subscribe,
+    cardWidthStore.getSnapshot,
+    cardWidthStore.getServerSnapshot
+  );
   const listHeight = useSyncExternalStore(
     listHeightStore.subscribe,
     listHeightStore.getSnapshot,
@@ -440,9 +450,25 @@ function useActivityListMeasurements(itemWidth: number, gap: number) {
     const container = containerRef.current;
     if (!container) return;
     const containerWidth = container.clientWidth;
+    const singleColumn =
+      getComputedStyle(container)
+        .getPropertyValue('--activity-single-column')
+        .trim() === '1';
+    if (singleColumn) {
+      const inner = container.querySelector<HTMLElement>(
+        `.${styles.summaryInner} > div`
+      );
+      const scrollbarInset = inner
+        ? parseFloat(getComputedStyle(inner).paddingRight)
+        : 0;
+      cardWidthStore.setSnapshot(Math.max(0, containerWidth - scrollbarInset));
+      itemsPerRowStore.setSnapshot(1);
+      return;
+    }
+    cardWidthStore.setSnapshot(itemWidth);
     const count = Math.floor((containerWidth + gap) / (itemWidth + gap));
     itemsPerRowStore.setSnapshot(count);
-  }, [gap, itemWidth, itemsPerRowStore]);
+  }, [gap, itemWidth, itemsPerRowStore, cardWidthStore]);
 
   const updateListHeight = useCallback(() => {
     const filterH = filterRef.current?.clientHeight || 0;
@@ -589,6 +615,7 @@ function useActivityListMeasurements(itemWidth: number, gap: number) {
 
   return {
     itemsPerRow,
+    cardWidth,
     listHeight,
     rowHeight,
     setFilterContainerRef,
@@ -638,7 +665,7 @@ const ActivityCardInner: React.FC<ActivityCardProps> = ({
 
   return (
     <div
-      className={`${styles.activityCard} ${interval === 'day' ? styles.activityCardFlippable : ''}`}
+      className={`${styles.activityCard} ${mobileStyles.activityCard} ${interval === 'day' ? styles.activityCardFlippable : ''}`}
       onClick={handleCardClick}
       style={{
         cursor:
@@ -649,7 +676,9 @@ const ActivityCardInner: React.FC<ActivityCardProps> = ({
         {/* Front side - Activity details */}
         <div className={styles.cardFront}>
           <h2 className={styles.activityName}>{period}</h2>
-          <div className={styles.activityDetails}>
+          <div
+            className={`${styles.activityDetails} ${mobileStyles.activityDetails}`}
+          >
             <p>
               <strong>{ACTIVITY_TOTAL.TOTAL_DISTANCE_TITLE}:</strong>{' '}
               {summary.totalDistance.toFixed(2)} {DIST_UNIT}
@@ -844,6 +873,7 @@ const ActivityList: React.FC = () => {
 
   const {
     itemsPerRow,
+    cardWidth,
     listHeight,
     rowHeight,
     setFilterContainerRef,
@@ -896,7 +926,7 @@ const ActivityList: React.FC = () => {
   const rowWidth =
     itemsPerRow < 1
       ? '100%'
-      : `${itemsPerRow * ITEM_WIDTH + Math.max(0, itemsPerRow - 1) * ITEM_GAP}px`;
+      : `${itemsPerRow * cardWidth + Math.max(0, itemsPerRow - 1) * ITEM_GAP}px`;
 
   const loading = itemsPerRow < 1 || !rowHeight;
   const SelectedYearSvg = selectedYear
@@ -904,12 +934,19 @@ const ActivityList: React.FC = () => {
     : null;
 
   return (
-    <div className={styles.activityList}>
-      <div className={styles.filterContainer} ref={setFilterContainerRef}>
-        <button className={styles.smallHomeButton} onClick={handleHomeClick}>
+    <div className={`${styles.activityList} ${mobileStyles.activityList}`}>
+      <div
+        className={`${styles.filterContainer} ${mobileStyles.filterContainer}`}
+        ref={setFilterContainerRef}
+      >
+        <button
+          className={`${styles.smallHomeButton} ${mobileStyles.smallHomeButton}`}
+          onClick={handleHomeClick}
+        >
           {HOME_PAGE_TITLE}
         </button>
         <select
+          aria-label="运动类型"
           onChange={(e) => setSportType(e.target.value)}
           value={sportType}
         >
@@ -924,6 +961,7 @@ const ActivityList: React.FC = () => {
           ))}
         </select>
         <select
+          aria-label="统计周期"
           onChange={(e) => toggleInterval(e.target.value as IntervalType)}
           value={interval}
         >
@@ -938,11 +976,13 @@ const ActivityList: React.FC = () => {
       {interval === 'life' && (
         <div className={styles.lifeContainer}>
           {/* Year selector buttons */}
-          <div className={styles.yearSelector}>
+          <div
+            className={`${styles.yearSelector} ${mobileStyles.yearSelector}`}
+          >
             {availableYears.map((year) => (
               <button
                 key={year}
-                className={`${styles.yearButton} ${selectedYear === year ? styles.yearButtonActive : ''}`}
+                className={`${styles.yearButton} ${mobileStyles.yearButton} ${selectedYear === year ? styles.yearButtonActive : ''}`}
                 onClick={() =>
                   setSelectedYear(selectedYear === year ? null : year)
                 }
@@ -954,7 +994,9 @@ const ActivityList: React.FC = () => {
           <Suspense fallback={<div>Loading SVG...</div>}>
             {SelectedYearSvg ? (
               // Show Year Summary SVG when a year is selected
-              <SelectedYearSvg className={styles.yearSummarySvg} />
+              <SelectedYearSvg
+                className={`${styles.yearSummarySvg} ${mobileStyles.yearSummarySvg}`}
+              />
             ) : (
               // Show Life SVG when no year is selected
               <>
@@ -974,7 +1016,10 @@ const ActivityList: React.FC = () => {
       )}
 
       {interval !== 'life' && (
-        <div className={styles.summaryContainer} ref={setSummaryContainerRef}>
+        <div
+          className={`${styles.summaryContainer} ${mobileStyles.summaryContainer}`}
+          ref={setSummaryContainerRef}
+        >
           {/* hidden sample card for measuring row height */}
           <div
             style={{
@@ -982,6 +1027,7 @@ const ActivityList: React.FC = () => {
               visibility: 'hidden',
               pointerEvents: 'none',
               height: 'auto',
+              width: cardWidth,
             }}
             ref={setSampleCardRef}
           >
@@ -1000,7 +1046,9 @@ const ActivityList: React.FC = () => {
               />
             )}
           </div>
-          <div className={styles.summaryInner}>
+          <div
+            className={`${styles.summaryInner} ${mobileStyles.summaryInner}`}
+          >
             <div style={{ width: rowWidth }}>
               {loading ? (
                 // Use full viewport height (or viewport minus filter height if available) to avoid flicker
@@ -1033,7 +1081,7 @@ const ActivityList: React.FC = () => {
                   {(row: RowGroup) => (
                     <div
                       ref={virtualListRef}
-                      className={styles.rowContainer}
+                      className={`${styles.rowContainer} ${mobileStyles.rowContainer}`}
                       style={{ gap: `${ITEM_GAP}px` }}
                     >
                       {row.map(
